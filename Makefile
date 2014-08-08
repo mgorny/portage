@@ -206,6 +206,9 @@ install:
 		find . -type d | xargs chmod $(DIRMODE); \
 		find . -type f | xargs chmod $(INSMODE); \
 	fi; \
+	# Substitute install path in portage.const. \
+	sed -i -e '/^PORTAGE_BASE_PATH/s@=.*@= "$(portage_base)"@' \
+		"$(DESTDIR)$(portage_base)/pym/portage/const.py" \
 
 clean:
 	set -e; \
