@@ -100,18 +100,10 @@ install:
 			cp -P $$symlinks "$(DESTDIR)$(portage_base)/$$x"; \
 		fi; \
 	done; \
-	\
-	for x in $$(cd "$(srcdir)" && find pym/* -type d \
-		! -path "pym/portage/tests*") ; do \
-		cd "$(srcdir)/$$x"; \
-		files=$$(echo *.py); \
-		if [ -z "$$files" ] || [ "$$files" = "*.py" ]; then \
-			# __pycache__ directories contain no py files \
-			continue; \
-		fi; \
-		install -d -m$(DIRMODE) "$(DESTDIR)$(portage_base)/$$x"; \
-		install -m$(INSMODE) $$files "$(DESTDIR)$(portage_base)/$$x"; \
-	done; \
+	# Use setup.py to install Python modules. \
+	cd "$(srcdir)"; \
+	./setup.py build; \
+	./setup.py install --compile -O2 --root="$(DESTDIR)" --portage-base="$(portage_base)"; \
 	\
 	install -d -m$(DIRMODE) "$(DESTDIR)$(bindir)"; \
 	relative_path=".."; \
@@ -158,22 +150,6 @@ install:
 	ln -sf "$$relative_path/bin/etc-update" \
 		"$(DESTDIR)$(sbindir)/update-etc"; \
 	\
-	# We install some minimal tests for use as a preinst sanity check. \
-	# These tests must be able to run without a full source tree and \
-	# without relying on a previous portage instance being installed. \
-	install -d -m$(DIRMODE) \
-		"$(DESTDIR)$(portage_base)/pym/portage/tests"; \
-	install -m$(EXEMODE) "$(srcdir)/pym/portage/tests/runTests" \
-		"$(DESTDIR)$(portage_base)/pym/portage/tests"; \
-	cd "$(srcdir)/pym/portage/tests"; \
-	install -m$(INSMODE) *.py \
-		"$(DESTDIR)$(portage_base)/pym/portage/tests"; \
-	install -d -m$(DIRMODE) \
-		"$(DESTDIR)$(portage_base)/pym/portage/tests/lint"; \
-	cd "$(srcdir)/pym/portage/tests/lint"; \
-	install -m$(INSMODE) *.py __test__ \
-		"$(DESTDIR)$(portage_base)/pym/portage/tests/lint"; \
-	\
 	install -d -m$(DIRMODE) "$(DESTDIR)$(docdir)"; \
 	cd "$(srcdir)"; \
 	install -m $(INSMODE) $(DOCS) "$(DESTDIR)$(docdir)"; \
@@ -206,9 +182,6 @@ install:
 		find . -type d | xargs chmod $(DIRMODE); \
 		find . -type f | xargs chmod $(INSMODE); \
 	fi; \
-	# Substitute install path in portage.const. \
-	sed -i -e '/^PORTAGE_BASE_PATH/s@=.*@= "$(portage_base)"@' \
-		"$(DESTDIR)$(portage_base)/pym/portage/const.py" \
 
 clean:
 	set -e; \
