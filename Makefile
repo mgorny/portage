@@ -26,7 +26,6 @@ EPYDOC_OPTS = -qqqqq --no-frames --show-imports
 INSMODE = 0644
 EXEMODE = 0755
 DIRMODE = 0755
-SYSCONFDIR_FILES = etc-update.conf dispatch-conf.conf
 PORTAGE_CONFDIR_FILES = make.conf.example make.globals repos.conf
 LOGROTATE_FILES = elog-save-summary
 BINDIR_FILES = ebuild egencache emerge emerge-webrsync \
@@ -71,9 +70,6 @@ test:
 install:
 	set -e; \
 	cd "$(srcdir)/cnf"; \
-	install -d -m$(DIRMODE) "$(DESTDIR)$(sysconfdir)"; \
-	install -m$(INSMODE) $(SYSCONFDIR_FILES) "$(DESTDIR)$(sysconfdir)"; \
-	\
 	install -d -m$(DIRMODE) "$(DESTDIR)$(portage_confdir)"; \
 	cd "$(srcdir)/cnf"; \
 	install -m$(INSMODE) $(PORTAGE_CONFDIR_FILES) \
@@ -103,7 +99,9 @@ install:
 	# Use setup.py to install Python modules. \
 	cd "$(srcdir)"; \
 	./setup.py build; \
-	./setup.py install --compile -O2 --root="$(DESTDIR)" --portage-base="$(portage_base)"; \
+	./setup.py install --compile -O2 --root="$(DESTDIR)" \
+		--portage-base="$(portage_base)" \
+		--sysconfdir="$(sysconfdir)"; \
 	\
 	install -d -m$(DIRMODE) "$(DESTDIR)$(bindir)"; \
 	relative_path=".."; \

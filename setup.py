@@ -5,17 +5,21 @@
 
 from distutils.core import setup
 from distutils.command.install import install
+from distutils.command.install_data import install_data
 from distutils.command.install_lib import install_lib
 
 import codecs, os, os.path, re
 
+sysconfdir = '/etc'
 
 extra_install_options = [
 	('portage-base=', 'b', "Portage install base"),
+	('sysconfdir=', None, 'System configuration path'),
 ]
 
 extra_install_option_mapping = [
 	('portage_base', 'portage_base'),
+	('sysconfdir', 'sysconfdir'),
 ]
 
 
@@ -27,6 +31,29 @@ class x_install(install):
 	def initialize_options(self):
 		install.initialize_options(self)
 		self.portage_base = '/usr/lib/portage'
+		self.sysconfdir = sysconfdir
+
+
+class x_install_data(install_data):
+	""" install_data with customized path support """
+
+	user_options = install_data.user_options + extra_install_options
+
+	def initialize_options(self):
+		install_data.initialize_options(self)
+		self.portage_base = None
+		self.sysconfdir = None
+
+	def finalize_options(self):
+		install_data.finalize_options(self)
+		self.set_undefined_options('install', *extra_install_option_mapping)
+
+		# substitute default paths in data_files with user-provided paths
+		dir_mapping = {
+			sysconfdir: self.sysconfdir,
+		}
+		for f in self.data_files:
+			f[0] = dir_mapping[f[0]]
 
 
 class x_install_lib(install_lib):
@@ -37,6 +64,7 @@ class x_install_lib(install_lib):
 	def initialize_options(self):
 		install_lib.initialize_options(self)
 		self.portage_base = None
+		self.sysconfdir = None
 
 	def finalize_options(self):
 		install_lib.finalize_options(self)
@@ -75,8 +103,13 @@ setup(
 		packages = list(find_packages()),
 		scripts = [],
 
+		data_files = [
+			[sysconfdir, ['cnf/etc-update.conf', 'cnf/dispatch-conf.conf']],
+		],
+
 		cmdclass = {
 			'install': x_install,
+			'install_data': x_install_data,
 			'install_lib': x_install_lib,
 		},
 
