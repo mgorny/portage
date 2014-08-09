@@ -20,7 +20,6 @@ docdir = $(datarootdir)/doc/$(PF)
 htmldir = $(docdir)/html
 portage_datadir = $(datarootdir)/$(PN)
 portage_base = $(libdir)/$(PN)
-EPYDOC_OPTS = -qqqqq --no-frames --show-imports
 INSMODE = 0644
 EXEMODE = 0755
 DIRMODE = 0755
@@ -35,23 +34,13 @@ all: docbook epydoc
 
 docbook:
 	set -e; \
-	touch "$(srcdir)/doc/fragment/date"; \
-	$(MAKE) -C "$(srcdir)/doc" xhtml xhtml-nochunks
+	cd "$(srcdir)"; \
+	./setup.py docbook
 
 epydoc:
 	set -e; \
-	env PYTHONPATH="$(PYTHONPATH)" epydoc \
-		-o "$(WORKDIR)/epydoc" \
-		--name $(PN) \
-		--url "$(HOMEPAGE)" \
-		$(EPYDOC_OPTS) \
-		$$(cd "$(srcdir)" && find pym -name '*.py' | sed \
-		-e s:/__init__.py$$:: \
-		-e s:\.py$$:: \
-		-e s:^pym/:: \
-		-e s:/:.:g \
-		| sort); \
-	rm -f "$(WORKDIR)/epydoc/api-objects.txt"; \
+	cd "$(srcdir)"; \
+	./setup.py epydoc
 
 test:
 	set -e; \
@@ -74,18 +63,13 @@ install:
 		--sysconfdir="$(sysconfdir)"; \
 	\
 	if [ -f "$(srcdir)/doc/portage.html" ] ; then \
-		install -d -m$(DIRMODE) "$(DESTDIR)$(htmldir)"; \
-		cd "$(srcdir)/doc"; \
-		install -m$(INSMODE) *.html "$(DESTDIR)$(htmldir)"; \
+		./setup.py install --root="$(DESTDIR)" \
+			install_docbook --htmldir="$(htmldir)"; \
 	fi; \
 	\
 	if [ -d "$(WORKDIR)/epydoc" ] ; then \
-		install -d -m$(DIRMODE) "$(DESTDIR)$(htmldir)"; \
-		cp -pPR "$(WORKDIR)/epydoc" \
-			"$(DESTDIR)$(htmldir)/api"; \
-		cd "$(DESTDIR)$(htmldir)/api"; \
-		find . -type d | xargs chmod $(DIRMODE); \
-		find . -type f | xargs chmod $(INSMODE); \
+		./setup.py install --root="$(DESTDIR)" \
+			install_epydoc --htmldir="$(htmldir)"; \
 	fi; \
 
 clean:

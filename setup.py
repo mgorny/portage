@@ -3,7 +3,7 @@
 # (c) 2010 Michał Górny <mgorny@gentoo.org>
 # Released under the terms of the 2-clause BSD license.
 
-from distutils.core import setup
+from distutils.core import setup, Command
 from distutils.command.build_scripts import build_scripts
 from distutils.command.install import install
 from distutils.command.install_data import install_data
@@ -11,13 +11,20 @@ from distutils.command.install_lib import install_lib
 from distutils.command.install_scripts import install_scripts
 from distutils.util import change_root
 
-import codecs, collections, os, os.path, re
+import codecs, collections, glob, os, os.path, re, subprocess
+
+# TODO:
+# 1. proper 'clean' command,
+# 2. 'test' command,
+# 3. smarter rebuilds of docs w/ 'install_docbook' and 'install_epydoc'.
 
 package_name = 'portage'
 package_version = '2.2.12'
+package_homepage = 'https://wiki.gentoo.org/wiki/Project:Portage'
 
 bindir = '/usr/bin'
 docdir = '/usr/share/doc/%s-%s' % (package_name, package_version)
+htmldir = os.path.join(docdir, 'html')
 mandir = '/usr/share/man'
 sbindir = '/usr/sbin'
 sysconfdir = '/etc'
@@ -31,6 +38,7 @@ portage_setsdir = os.path.join(portage_confdir, 'sets')
 extra_install_options = [
 	('bindir=', None, "Install directory for main executables"),
 	('docdir=', None, "Documentation install directory"),
+	('htmldir=', None, "HTML documentation install directory"),
 	('mandir=', None, "Manpage root install directory"),
 	('portage-base=', 'b', "Portage install base"),
 	('portage-bindir=', None, "Install directory for Portage internal-use executables"),
@@ -57,6 +65,112 @@ x_scripts = {
 		'bin/etc-update', 'bin/fixpackages', 'bin/regenworld'
 	],
 }
+
+
+class docbook(Command):
+	""" Build docs using docbook. """
+
+	user_options = [
+		('doc-formats=', None, 'Documentation formats to build (all xmlto formats for docbook are allowed, comma-separated'),
+	]
+
+	def initialize_options(self):
+		self.doc_formats = 'xhtml,xhtml-nochunks'
+
+	def finalize_options(self):
+		self.doc_formats = self.doc_formats.replace(',', ' ').split()
+
+	def run(self):
+		with open('doc/fragment/date', 'w'):
+			pass
+
+		for f in self.doc_formats:
+			print('Building docs in %s format...' % f)
+			subprocess.check_call(['xmlto', '-o', 'doc',
+				'-m', 'doc/custom.xsl', f, 'doc/portage.docbook'])
+
+
+class epydoc(Command):
+	""" Build API docs using epydoc. """
+
+	user_options = [
+	]
+
+	def initialize_options(self):
+		self.build_lib = None
+
+	def finalize_options(self):
+		self.set_undefined_options('build_py', ('build_lib', 'build_lib'))
+
+	def run(self):
+		self.run_command('build_py')
+
+		print('Building API documentation...')
+
+		process_env = os.environ.copy()
+		pythonpath = self.build_lib
+		try:
+			pythonpath += ':' + process_env['PYTHONPATH']
+		except KeyError:
+			pass
+		process_env['PYTHONPATH'] = pythonpath
+
+		subprocess.check_call(['epydoc', '-o', 'epydoc',
+			'--name', package_name,
+			'--url', package_homepage,
+			'-qq', '--no-frames', '--show-imports',
+			'--exclude', 'portage.tests',
+			'_emerge', 'portage', 'repoman'],
+			env = process_env)
+		os.remove('epydoc/api-objects.txt')
+
+
+class install_docbook(install_data):
+	""" install_data for docbook docs """
+
+	user_options = install_data.user_options + [
+		('htmldir=', None, "HTML documentation install directory"),
+	]
+
+	def initialize_options(self):
+		install_data.initialize_options(self)
+		self.htmldir = None
+
+	def finalize_options(self):
+		self.set_undefined_options('install', ('htmldir', 'htmldir'))
+		install_data.finalize_options(self)
+
+	def run(self):
+		if not os.path.exists('doc/portage.html'):
+			self.run_command('docbook')
+		self.data_files = [
+			(self.htmldir, glob.glob('doc/*.html')),
+		]
+		install_data.run(self)
+
+
+class install_epydoc(install_data):
+	""" install_data for epydoc docs """
+
+	user_options = install_data.user_options + [
+		('htmldir=', None, "HTML documentation install directory"),
+	]
+
+	def initialize_options(self):
+		install_data.initialize_options(self)
+		self.htmldir = None
+
+	def finalize_options(self):
+		self.set_undefined_options('install', ('htmldir', 'htmldir'))
+		install_data.finalize_options(self)
+
+	def run(self):
+		if not os.path.exists('epydoc/index.html'):
+			self.run_command('epydoc')
+		self.data_files = [
+			(os.path.join(self.htmldir, 'api'), glob.glob('epydoc/*')),
+		]
+		install_data.run(self)
 
 
 class x_build_scripts_custom(build_scripts):
@@ -124,6 +238,7 @@ class x_install(install):
 		install.initialize_options(self)
 		self.bindir = bindir
 		self.docdir = docdir
+		self.htmldir = htmldir
 		self.mandir = mandir
 		self.portage_base = portage_base
 		self.portage_bindir = portage_bindir
@@ -138,6 +253,7 @@ class x_install(install):
 			self.bindir = change_root(self.root, self.bindir)
 			self.sbindir = change_root(self.root, self.sbindir)
 			self.portage_bindir = change_root(self.root, self.portage_bindir)
+
 
 class x_install_data(install_data):
 	""" install_data with customized path support """
@@ -280,7 +396,7 @@ setup(
 		version = package_version,
 		author = 'Gentoo Portage Development Team',
 		author_email = 'dev-portage@gentoo.org',
-		url = 'https://wiki.gentoo.org/wiki/Project:Portage',
+		url = package_homepage,
 
 		package_dir = {'': 'pym'},
 		packages = list(find_packages()),
@@ -301,8 +417,12 @@ setup(
 			'build_scripts_bin': x_build_scripts_bin,
 			'build_scripts_portagebin': x_build_scripts_portagebin,
 			'build_scripts_sbin': x_build_scripts_sbin,
+			'docbook': docbook,
+			'epydoc': epydoc,
 			'install': x_install,
 			'install_data': x_install_data,
+			'install_docbook': install_docbook,
+			'install_epydoc': install_epydoc,
 			'install_lib': x_install_lib,
 			'install_scripts': x_install_scripts,
 			'install_scripts_bin': x_install_scripts_bin,
