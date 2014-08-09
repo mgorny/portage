@@ -274,7 +274,9 @@ class SimpleRepomanTestCase(TestCase):
 			os.symlink(test_repo_location, test_repo_symlink)
 			# repoman checks metadata.dtd for recent CTIME, so copy the file in
 			# order to ensure that the CTIME is current
-			shutil.copyfile(metadata_dtd, os.path.join(distdir, "metadata.dtd"))
+			# NOTE: if we don't have the file around, let repoman try to fetch it.
+			if os.path.exists(metadata_dtd):
+				shutil.copyfile(metadata_dtd, os.path.join(distdir, "metadata.dtd"))
 
 			if debug:
 				# The subprocess inherits both stdout and stderr, for

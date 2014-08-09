@@ -3,6 +3,7 @@
 
 import tempfile
 
+import portage
 from portage import os
 from portage import shutil
 from portage import _unicode_encode
@@ -26,9 +27,7 @@ class GetConfigTestCase(TestCase):
 	}
 
 	def testGetConfig(self):
-
-		make_globals_file = os.path.join(PORTAGE_BASE_PATH,
-			'cnf', 'make.globals')
+		make_globals_file = os.path.join(self.cnf_path, "make.globals")
 		d = getconfig(make_globals_file)
 		for k, v in self._cases.items():
 			self.assertEqual(d[k], v)

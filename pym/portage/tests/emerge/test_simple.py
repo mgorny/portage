@@ -368,7 +368,7 @@ pkg_preinst() {
 			for x in true_symlinks:
 				os.symlink(true_binary, os.path.join(fake_bin, x))
 			for x in etc_symlinks:
-				os.symlink(os.path.join(PORTAGE_BASE_PATH, "cnf", x),
+				os.symlink(os.path.join(self.cnf_etc_path, x),
 					os.path.join(eprefix, "etc", x))
 			with open(os.path.join(var_cache_edb, "counter"), 'wb') as f:
 				f.write(b"100")

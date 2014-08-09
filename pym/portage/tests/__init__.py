@@ -25,7 +25,17 @@ import portage
 from portage import os
 from portage import _encodings
 from portage import _unicode_decode
+from portage.const import EPREFIX, GLOBAL_CONFIG_PATH, PORTAGE_BASE_PATH
 from portage.util._argparse import ArgumentParser
+
+
+if portage._not_installed:
+	cnf_path = os.path.join(PORTAGE_BASE_PATH, 'cnf')
+	cnf_etc_path = cnf_path
+else:
+	cnf_path = os.path.join(EPREFIX or '/', GLOBAL_CONFIG_PATH)
+	cnf_etc_path = os.path.join(EPREFIX or '/', 'etc')
+
 
 def main():
 	suite = unittest.TestSuite()
@@ -178,6 +188,8 @@ class TestCase(unittest.TestCase):
 		unittest.TestCase.__init__(self, *pargs, **kwargs)
 		self.todo = False
 		self.portage_skip = None
+		self.cnf_path = cnf_path
+		self.cnf_etc_path = cnf_etc_path
 
 	def defaultTestResult(self):
 		return TextTestResult()
