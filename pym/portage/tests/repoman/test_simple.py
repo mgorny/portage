@@ -9,7 +9,7 @@ import portage
 from portage import os
 from portage import shutil
 from portage import _unicode_decode
-from portage.const import PORTAGE_BASE_PATH, PORTAGE_BIN_PATH, PORTAGE_PYM_PATH
+from portage.const import PORTAGE_BASE_PATH, PORTAGE_PYM_PATH
 from portage.process import find_binary
 from portage.tests import TestCase
 from portage.tests.resolver.ResolverPlayground import ResolverPlayground
@@ -171,7 +171,7 @@ class SimpleRepomanTestCase(TestCase):
 		license_dir = os.path.join(test_repo_location, "licenses")
 
 		repoman_cmd = (portage._python_interpreter, "-b", "-Wd",
-			os.path.join(PORTAGE_BIN_PATH, "repoman"))
+			os.path.join(self.bindir, "repoman"))
 
 		git_binary = find_binary("git")
 		git_cmd = (git_binary,)
