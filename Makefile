@@ -19,14 +19,11 @@ mandir = $(datarootdir)/man
 docdir = $(datarootdir)/doc/$(PF)
 htmldir = $(docdir)/html
 portage_datadir = $(datarootdir)/$(PN)
-portage_confdir = $(portage_datadir)/config
-portage_setsdir = $(portage_confdir)/sets
 portage_base = $(libdir)/$(PN)
 EPYDOC_OPTS = -qqqqq --no-frames --show-imports
 INSMODE = 0644
 EXEMODE = 0755
 DIRMODE = 0755
-PORTAGE_CONFDIR_FILES = make.conf.example make.globals repos.conf
 BINDIR_FILES = ebuild egencache emerge emerge-webrsync \
 	emirrordist portageq quickpkg repoman
 SBINDIR_FILES = archive-conf dispatch-conf emaint \
@@ -68,14 +65,6 @@ test:
 
 install:
 	set -e; \
-	cd "$(srcdir)/cnf"; \
-	install -d -m$(DIRMODE) "$(DESTDIR)$(portage_confdir)"; \
-	cd "$(srcdir)/cnf"; \
-	install -m$(INSMODE) $(PORTAGE_CONFDIR_FILES) \
-		"$(DESTDIR)$(portage_confdir)"; \
-	install -d -m$(DIRMODE) "$(DESTDIR)$(portage_setsdir)"; \
-	cd "$(S)/cnf/sets"; \
-	install -m$(INSMODE) *.conf "$(DESTDIR)$(portage_setsdir)"; \
 	\
 	for x in $$(cd "$(srcdir)" && find bin -type d) ; do \
 		cd "$(srcdir)/$$x"; \
@@ -95,6 +84,7 @@ install:
 	./setup.py build; \
 	./setup.py install --compile -O2 --root="$(DESTDIR)" \
 		--portage-base="$(portage_base)" \
+		--portage-datadir="$(portage_datadir)" \
 		--sysconfdir="$(sysconfdir)"; \
 	\
 	install -d -m$(DIRMODE) "$(DESTDIR)$(bindir)"; \
