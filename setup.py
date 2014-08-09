@@ -18,6 +18,7 @@ package_version = '2.2.12'
 
 bindir = '/usr/bin'
 docdir = '/usr/share/doc/%s-%s' % (package_name, package_version)
+mandir = '/usr/share/man'
 sbindir = '/usr/sbin'
 sysconfdir = '/etc'
 logrotatedir = os.path.join(sysconfdir, 'logrotate.d')
@@ -30,6 +31,7 @@ portage_setsdir = os.path.join(portage_confdir, 'sets')
 extra_install_options = [
 	('bindir=', None, "Install directory for main executables"),
 	('docdir=', None, "Documentation install directory"),
+	('mandir=', None, "Manpage root install directory"),
 	('portage-base=', 'b', "Portage install base"),
 	('portage-bindir=', None, "Install directory for Portage internal-use executables"),
 	('portage-datadir=', None, 'Install directory for data files'),
@@ -39,6 +41,7 @@ extra_install_options = [
 
 extra_install_option_mapping = [
 	('docdir', 'docdir'),
+	('mandir', 'mandir'),
 	('portage_base', 'portage_base'),
 	('portage_datadir', 'portage_datadir'),
 	('sysconfdir', 'sysconfdir'),
@@ -121,6 +124,7 @@ class x_install(install):
 		install.initialize_options(self)
 		self.bindir = bindir
 		self.docdir = docdir
+		self.mandir = mandir
 		self.portage_base = portage_base
 		self.portage_bindir = portage_bindir
 		self.portage_datadir = portage_datadir
@@ -142,6 +146,7 @@ class x_install_data(install_data):
 	def initialize_options(self):
 		install_data.initialize_options(self)
 		self.docdir = None
+		self.mandir = None
 		self.portage_base = None
 		self.portage_datadir = None
 		self.sysconfdir = None
@@ -163,7 +168,10 @@ class x_install_data(install_data):
 			docdir: self.docdir,
 		}
 		for f in self.data_files:
-			f[0] = dir_mapping[f[0]]
+			if f[0].startswith(mandir):
+				f[0] = self.mandir + f[0][len(mandir):]
+			else:
+				f[0] = dir_mapping[f[0]]
 
 
 class x_install_lib(install_lib):
@@ -174,6 +182,7 @@ class x_install_lib(install_lib):
 	def initialize_options(self):
 		install_lib.initialize_options(self)
 		self.docdir = None
+		self.mandir = None
 		self.portage_base = None
 		self.portage_datadir = None
 		self.sysconfdir = None
@@ -249,6 +258,22 @@ def find_scripts():
 			yield os.path.join(dirpath, f)
 
 
+def get_manpages():
+	linguas = os.environ.get('LINGUAS')
+	if linguas is not None:
+		linguas = linguas.split()
+
+	for dirpath, dirnames, filenames in os.walk('man'):
+		groups = collections.defaultdict(list)
+		for f in filenames:
+			fn, suffix = f.rsplit('.', 1)
+			groups[suffix].append(os.path.join(dirpath, f))
+
+		topdir = dirpath[len('man/'):]
+		if not topdir or linguas is None or topdir in linguas:
+			for g, mans in groups.items():
+				yield [os.path.join(mandir, topdir, 'man%s' % g), mans]
+
 setup(
 		name = package_name,
 		version = package_version,
@@ -261,7 +286,7 @@ setup(
 		# something to cheat build & install commands
 		scripts = list(find_scripts()),
 
-		data_files = [
+		data_files = list(get_manpages()) + [
 			[sysconfdir, ['cnf/etc-update.conf', 'cnf/dispatch-conf.conf']],
 			[logrotatedir, ['cnf/logrotate.d/elog-save-summary']],
 			[portage_confdir, [

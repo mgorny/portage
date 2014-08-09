@@ -24,7 +24,6 @@ EPYDOC_OPTS = -qqqqq --no-frames --show-imports
 INSMODE = 0644
 EXEMODE = 0755
 DIRMODE = 0755
-LINGUAS ?= $(shell cd "$(srcdir)/man" && find -mindepth 1 -type d)
 
 ifdef PYTHONPATH
 	PYTHONPATH := $(srcdir)/pym:$(PYTHONPATH)
@@ -67,25 +66,12 @@ install:
 	./setup.py install --compile -O2 --root="$(DESTDIR)" \
 		--bindir="$(bindir)" \
 		--docdir="$(docdir)" \
+		--mandir="$(mandir)" \
 		--portage-base="$(portage_base)" \
 		--portage-bindir="$(portage_base)/bin" \
 		--portage-datadir="$(portage_datadir)" \
 		--sbindir="$(sbindir)" \
 		--sysconfdir="$(sysconfdir)"; \
-	\
-	for x in "" $(LINGUAS); do \
-		for y in 1 5 ; do \
-			if [ -d "$(srcdir)/man/$$x" ]; then \
-				cd "$(srcdir)/man/$$x"; \
-				files=$$(echo *.$$y); \
-				if [ -z "$$files" ] || [ "$$files" = "*.$$y" ]; then \
-					continue; \
-				fi; \
-				install -d -m$(DIRMODE) "$(DESTDIR)$(mandir)/$$x/man$$y"; \
-				install -m$(INSMODE) *.$$y "$(DESTDIR)$(mandir)/$$x/man$$y"; \
-			fi; \
-		done; \
-	done; \
 	\
 	if [ -f "$(srcdir)/doc/portage.html" ] ; then \
 		install -d -m$(DIRMODE) "$(DESTDIR)$(htmldir)"; \
