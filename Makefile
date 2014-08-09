@@ -24,7 +24,6 @@ EPYDOC_OPTS = -qqqqq --no-frames --show-imports
 INSMODE = 0644
 EXEMODE = 0755
 DIRMODE = 0755
-DOCS = ChangeLog NEWS RELEASE-NOTES
 LINGUAS ?= $(shell cd "$(srcdir)/man" && find -mindepth 1 -type d)
 
 ifdef PYTHONPATH
@@ -67,15 +66,12 @@ install:
 	./setup.py build; \
 	./setup.py install --compile -O2 --root="$(DESTDIR)" \
 		--bindir="$(bindir)" \
+		--docdir="$(docdir)" \
 		--portage-base="$(portage_base)" \
 		--portage-bindir="$(portage_base)/bin" \
 		--portage-datadir="$(portage_datadir)" \
 		--sbindir="$(sbindir)" \
 		--sysconfdir="$(sysconfdir)"; \
-	\
-	install -d -m$(DIRMODE) "$(DESTDIR)$(docdir)"; \
-	cd "$(srcdir)"; \
-	install -m $(INSMODE) $(DOCS) "$(DESTDIR)$(docdir)"; \
 	\
 	for x in "" $(LINGUAS); do \
 		for y in 1 5 ; do \

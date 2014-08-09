@@ -13,7 +13,11 @@ from distutils.util import change_root
 
 import codecs, collections, os, os.path, re
 
+package_name = 'portage'
+package_version = '2.2.12'
+
 bindir = '/usr/bin'
+docdir = '/usr/share/doc/%s-%s' % (package_name, package_version)
 sbindir = '/usr/sbin'
 sysconfdir = '/etc'
 logrotatedir = os.path.join(sysconfdir, 'logrotate.d')
@@ -25,6 +29,7 @@ portage_setsdir = os.path.join(portage_confdir, 'sets')
 
 extra_install_options = [
 	('bindir=', None, "Install directory for main executables"),
+	('docdir=', None, "Documentation install directory"),
 	('portage-base=', 'b', "Portage install base"),
 	('portage-bindir=', None, "Install directory for Portage internal-use executables"),
 	('portage-datadir=', None, 'Install directory for data files'),
@@ -33,6 +38,7 @@ extra_install_options = [
 ]
 
 extra_install_option_mapping = [
+	('docdir', 'docdir'),
 	('portage_base', 'portage_base'),
 	('portage_datadir', 'portage_datadir'),
 	('sysconfdir', 'sysconfdir'),
@@ -114,6 +120,7 @@ class x_install(install):
 	def initialize_options(self):
 		install.initialize_options(self)
 		self.bindir = bindir
+		self.docdir = docdir
 		self.portage_base = portage_base
 		self.portage_bindir = portage_bindir
 		self.portage_datadir = portage_datadir
@@ -134,6 +141,7 @@ class x_install_data(install_data):
 
 	def initialize_options(self):
 		install_data.initialize_options(self)
+		self.docdir = None
 		self.portage_base = None
 		self.portage_datadir = None
 		self.sysconfdir = None
@@ -152,6 +160,7 @@ class x_install_data(install_data):
 			logrotatedir: self.logrotatedir,
 			portage_confdir: self.portage_confdir,
 			portage_setsdir: self.portage_setsdir,
+			docdir: self.docdir,
 		}
 		for f in self.data_files:
 			f[0] = dir_mapping[f[0]]
@@ -164,6 +173,7 @@ class x_install_lib(install_lib):
 
 	def initialize_options(self):
 		install_lib.initialize_options(self)
+		self.docdir = None
 		self.portage_base = None
 		self.portage_datadir = None
 		self.sysconfdir = None
@@ -240,8 +250,8 @@ def find_scripts():
 
 
 setup(
-		name = 'portage',
-		version = '2.2.12',
+		name = package_name,
+		version = package_version,
 		author = 'Gentoo Portage Development Team',
 		author_email = 'dev-portage@gentoo.org',
 		url = 'https://wiki.gentoo.org/wiki/Project:Portage',
@@ -257,6 +267,7 @@ setup(
 			[portage_confdir, [
 				'cnf/make.conf.example', 'cnf/make.globals', 'cnf/repos.conf']],
 			[portage_setsdir, ['cnf/sets/portage.conf']],
+			[docdir, ['ChangeLog', 'NEWS', 'RELEASE-NOTES']],
 		],
 
 		cmdclass = {
