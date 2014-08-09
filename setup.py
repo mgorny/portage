@@ -134,9 +134,10 @@ class x_install(install):
 	def finalize_options(self):
 		install.finalize_options(self)
 		# prepend root to bindirs
-		self.bindir = change_root(self.root, self.bindir)
-		self.sbindir = change_root(self.root, self.sbindir)
-		self.portage_bindir = change_root(self.root, self.portage_bindir)
+		if self.root is not None:
+			self.bindir = change_root(self.root, self.bindir)
+			self.sbindir = change_root(self.root, self.sbindir)
+			self.portage_bindir = change_root(self.root, self.portage_bindir)
 
 class x_install_data(install_data):
 	""" install_data with customized path support """
