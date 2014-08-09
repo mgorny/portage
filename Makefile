@@ -27,7 +27,6 @@ INSMODE = 0644
 EXEMODE = 0755
 DIRMODE = 0755
 PORTAGE_CONFDIR_FILES = make.conf.example make.globals repos.conf
-LOGROTATE_FILES = elog-save-summary
 BINDIR_FILES = ebuild egencache emerge emerge-webrsync \
 	emirrordist portageq quickpkg repoman
 SBINDIR_FILES = archive-conf dispatch-conf emaint \
@@ -77,11 +76,6 @@ install:
 	install -d -m$(DIRMODE) "$(DESTDIR)$(portage_setsdir)"; \
 	cd "$(S)/cnf/sets"; \
 	install -m$(INSMODE) *.conf "$(DESTDIR)$(portage_setsdir)"; \
-	\
-	install -d -m$(DIRMODE) "$(DESTDIR)$(sysconfdir)/logrotate.d"; \
-	cd "$(srcdir)/cnf/logrotate.d"; \
-	install -m$(INSMODE) $(LOGROTATE_FILES) \
-		"$(DESTDIR)$(sysconfdir)/logrotate.d"; \
 	\
 	for x in $$(cd "$(srcdir)" && find bin -type d) ; do \
 		cd "$(srcdir)/$$x"; \

@@ -11,6 +11,7 @@ from distutils.command.install_lib import install_lib
 import codecs, os, os.path, re
 
 sysconfdir = '/etc'
+logrotatedir = os.path.join(sysconfdir, 'logrotate.d')
 
 extra_install_options = [
 	('portage-base=', 'b', "Portage install base"),
@@ -48,9 +49,12 @@ class x_install_data(install_data):
 		install_data.finalize_options(self)
 		self.set_undefined_options('install', *extra_install_option_mapping)
 
+		self.logrotatedir = os.path.join(self.sysconfdir, 'logrotate.d')
+
 		# substitute default paths in data_files with user-provided paths
 		dir_mapping = {
 			sysconfdir: self.sysconfdir,
+			logrotatedir: self.logrotatedir,
 		}
 		for f in self.data_files:
 			f[0] = dir_mapping[f[0]]
@@ -105,6 +109,7 @@ setup(
 
 		data_files = [
 			[sysconfdir, ['cnf/etc-update.conf', 'cnf/dispatch-conf.conf']],
+			[logrotatedir, ['cnf/logrotate.d/elog-save-summary']],
 		],
 
 		cmdclass = {
