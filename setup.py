@@ -4,21 +4,31 @@
 # Released under the terms of the 2-clause BSD license.
 
 from distutils.core import setup
+from distutils.command.build_scripts import build_scripts
 from distutils.command.install import install
 from distutils.command.install_data import install_data
 from distutils.command.install_lib import install_lib
+from distutils.command.install_scripts import install_scripts
+from distutils.util import change_root
 
-import codecs, os, os.path, re
+import codecs, collections, os, os.path, re
 
+bindir = '/usr/bin'
+sbindir = '/usr/sbin'
 sysconfdir = '/etc'
 logrotatedir = os.path.join(sysconfdir, 'logrotate.d')
+portage_base = '/usr/lib/portage'
+portage_bindir = os.path.join(portage_base, 'bin')
 portage_datadir = '/usr/share/portage'
 portage_confdir = os.path.join(portage_datadir, 'config')
 portage_setsdir = os.path.join(portage_confdir, 'sets')
 
 extra_install_options = [
+	('bindir=', None, "Install directory for main executables"),
 	('portage-base=', 'b', "Portage install base"),
+	('portage-bindir=', None, "Install directory for Portage internal-use executables"),
 	('portage-datadir=', None, 'Install directory for data files'),
+	('sbindir=', None, "Install directory for superuser-intended executables"),
 	('sysconfdir=', None, 'System configuration path'),
 ]
 
@@ -28,6 +38,73 @@ extra_install_option_mapping = [
 	('sysconfdir', 'sysconfdir'),
 ]
 
+x_scripts = {
+	'bin': [
+		'bin/ebuild', 'bin/egencache', 'bin/emerge', 'bin/emerge-webrsync',
+		'bin/emirrordist', 'bin/portageq', 'bin/quickpkg', 'bin/repoman'
+	],
+	'sbin': [
+		'bin/archive-conf', 'bin/dispatch-conf', 'bin/emaint', 'bin/env-update',
+		'bin/etc-update', 'bin/fixpackages', 'bin/regenworld'
+	],
+}
+
+
+class x_build_scripts_custom(build_scripts):
+	def finalize_options(self):
+		build_scripts.finalize_options(self)
+		self.build_dir = os.path.join(self.build_dir, self.dir_name)
+		self.scripts = x_scripts[self.dir_name]
+
+
+class x_build_scripts_bin(x_build_scripts_custom):
+	dir_name = 'bin'
+
+
+class x_build_scripts_sbin(x_build_scripts_custom):
+	dir_name = 'sbin'
+
+
+class x_build_scripts_portagebin(build_scripts):
+	def finalize_options(self):
+		build_scripts.finalize_options(self)
+		self.build_dir = os.path.join(self.build_dir, 'portage')
+
+	def run(self):
+		# group scripts by subdirectory
+		split_scripts = collections.defaultdict(list)
+		for f in self.scripts:
+			for other_files in x_scripts.values():
+				if f in other_files:
+					break
+			else:
+				dir_name = os.path.dirname(f[len('bin/'):])
+				split_scripts[dir_name].append(f)
+
+		base_dir = self.build_dir
+		base_scripts = self.scripts
+		for d, files in split_scripts.items():
+			self.build_dir = os.path.join(base_dir, d)
+			self.scripts = files
+			self.copy_scripts()
+
+		# restore previous values
+		self.build_dir = base_dir
+		self.scripts = base_scripts
+
+
+class x_build_scripts(build_scripts):
+	def initialize_option(self):
+		pass
+
+	def finalize_options(self):
+		pass
+
+	def run(self):
+		self.run_command('build_scripts_bin')
+		self.run_command('build_scripts_portagebin')
+		self.run_command('build_scripts_sbin')
+
 
 class x_install(install):
 	""" install command with extra Portage paths """
@@ -36,10 +113,19 @@ class x_install(install):
 
 	def initialize_options(self):
 		install.initialize_options(self)
-		self.portage_base = '/usr/lib/portage'
-		self.portage_datadir = '/usr/share/portage'
+		self.bindir = bindir
+		self.portage_base = portage_base
+		self.portage_bindir = portage_bindir
+		self.portage_datadir = portage_datadir
+		self.sbindir = sbindir
 		self.sysconfdir = sysconfdir
 
+	def finalize_options(self):
+		install.finalize_options(self)
+		# prepend root to bindirs
+		self.bindir = change_root(self.root, self.bindir)
+		self.sbindir = change_root(self.root, self.sbindir)
+		self.portage_bindir = change_root(self.root, self.portage_bindir)
 
 class x_install_data(install_data):
 	""" install_data with customized path support """
@@ -106,10 +192,51 @@ class x_install_lib(install_lib):
 		return ret
 
 
+class x_install_scripts_custom(install_scripts):
+	def finalize_options(self):
+		self.set_undefined_options('install', (self.var_name, 'install_dir'))
+		install_scripts.finalize_options(self)
+		self.build_dir = os.path.join(self.build_dir, self.dir_name)
+
+
+class x_install_scripts_bin(x_install_scripts_custom):
+	dir_name = 'bin'
+	var_name = 'bindir'
+
+
+class x_install_scripts_sbin(x_install_scripts_custom):
+	dir_name = 'sbin'
+	var_name = 'sbindir'
+
+
+class x_install_scripts_portagebin(x_install_scripts_custom):
+	dir_name = 'portage'
+	var_name = 'portage_bindir'
+
+
+class x_install_scripts(install_scripts):
+	def initialize_option(self):
+		pass
+
+	def finalize_options(self):
+		pass
+
+	def run(self):
+		self.run_command('install_scripts_bin')
+		self.run_command('install_scripts_portagebin')
+		self.run_command('install_scripts_sbin')
+
+
 def find_packages():
 	for dirpath, dirnames, filenames in os.walk('pym'):
 		if '__init__.py' in filenames:
 			yield os.path.relpath(dirpath, 'pym')
+
+
+def find_scripts():
+	for dirpath, dirnames, filenames in os.walk('bin'):
+		for f in filenames:
+			yield os.path.join(dirpath, f)
 
 
 setup(
@@ -121,7 +248,8 @@ setup(
 
 		package_dir = {'': 'pym'},
 		packages = list(find_packages()),
-		scripts = [],
+		# something to cheat build & install commands
+		scripts = list(find_scripts()),
 
 		data_files = [
 			[sysconfdir, ['cnf/etc-update.conf', 'cnf/dispatch-conf.conf']],
@@ -132,9 +260,17 @@ setup(
 		],
 
 		cmdclass = {
+			'build_scripts': x_build_scripts,
+			'build_scripts_bin': x_build_scripts_bin,
+			'build_scripts_portagebin': x_build_scripts_portagebin,
+			'build_scripts_sbin': x_build_scripts_sbin,
 			'install': x_install,
 			'install_data': x_install_data,
 			'install_lib': x_install_lib,
+			'install_scripts': x_install_scripts,
+			'install_scripts_bin': x_install_scripts_bin,
+			'install_scripts_portagebin': x_install_scripts_portagebin,
+			'install_scripts_sbin': x_install_scripts_sbin,
 		},
 
 		classifiers = [

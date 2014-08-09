@@ -24,10 +24,6 @@ EPYDOC_OPTS = -qqqqq --no-frames --show-imports
 INSMODE = 0644
 EXEMODE = 0755
 DIRMODE = 0755
-BINDIR_FILES = ebuild egencache emerge emerge-webrsync \
-	emirrordist portageq quickpkg repoman
-SBINDIR_FILES = archive-conf dispatch-conf emaint \
-	env-update etc-update fixpackages regenworld
 DOCS = ChangeLog NEWS RELEASE-NOTES
 LINGUAS ?= $(shell cd "$(srcdir)/man" && find -mindepth 1 -type d)
 
@@ -66,71 +62,16 @@ test:
 install:
 	set -e; \
 	\
-	for x in $$(cd "$(srcdir)" && find bin -type d) ; do \
-		cd "$(srcdir)/$$x"; \
-		install -d -m$(DIRMODE) "$(DESTDIR)$(portage_base)/$$x"; \
-		files=$$(find . -mindepth 1 -maxdepth 1 -type f ! -type l); \
-		if [ -n "$$files" ] ; then \
-			install -m$(EXEMODE) $$files \
-				"$(DESTDIR)$(portage_base)/$$x"; \
-		fi; \
-		symlinks=$$(find . -mindepth 1 -maxdepth 1 -type l); \
-		if [ -n "$$symlinks" ] ; then \
-			cp -P $$symlinks "$(DESTDIR)$(portage_base)/$$x"; \
-		fi; \
-	done; \
 	# Use setup.py to install Python modules. \
 	cd "$(srcdir)"; \
 	./setup.py build; \
 	./setup.py install --compile -O2 --root="$(DESTDIR)" \
+		--bindir="$(bindir)" \
 		--portage-base="$(portage_base)" \
+		--portage-bindir="$(portage_base)/bin" \
 		--portage-datadir="$(portage_datadir)" \
+		--sbindir="$(sbindir)" \
 		--sysconfdir="$(sysconfdir)"; \
-	\
-	install -d -m$(DIRMODE) "$(DESTDIR)$(bindir)"; \
-	relative_path=".."; \
-	x=$(bindir) ; \
-	y="$(portage_base)"; \
-	if [ "$${x#$(prefix)}" != "$$x" ] && \
-		[ "$${y#$(prefix)}" != "$$y" ]; then \
-		x=$${x#$(prefix)}; \
-		y=$${y#$(prefix)}; \
-	fi; \
-	x=$${x%/*}; \
-	while [ -n "$$x" ] ; do \
-		relative_path=$${relative_path}/..; \
-		x=$${x%/*}; \
-	done; \
-	relative_path=$$relative_path$$y; \
-	for x in $(BINDIR_FILES) ; do \
-		ln -sf "$$relative_path/bin/$$x" \
-			"$(DESTDIR)$(bindir)/$$x"; \
-	done; \
-	\
-	install -d -m$(DIRMODE) "$(DESTDIR)$(sbindir)"; \
-	relative_path=".."; \
-	x=$(sbindir) ; \
-	y="$(portage_base)"; \
-	if [ "$${x#$(prefix)}" != "$$x" ] && \
-		[ "$${y#$(prefix)}" != "$$y" ]; then \
-		x=$${x#$(prefix)}; \
-		y=$${y#$(prefix)}; \
-	fi; \
-	x=$${x%/*}; \
-	while [ -n "$$x" ] ; do \
-		relative_path=$${relative_path}/..; \
-		x=$${x%/*}; \
-	done; \
-	relative_path=$$relative_path$$y; \
-	for x in $(SBINDIR_FILES) ; do \
-		ln -sf "$$relative_path/bin/$$x" \
-			"$(DESTDIR)$(sbindir)/$$x"; \
-	done; \
-	\
-	ln -sf "$$relative_path/bin/env-update" \
-		"$(DESTDIR)$(sbindir)/update-env"; \
-	ln -sf "$$relative_path/bin/etc-update" \
-		"$(DESTDIR)$(sbindir)/update-etc"; \
 	\
 	install -d -m$(DIRMODE) "$(DESTDIR)$(docdir)"; \
 	cd "$(srcdir)"; \
