@@ -7,4 +7,7 @@ python:
     - 3.4
     - pypy
 script:
-    - python -b -Wd pym/portage/tests/runTests.py
+    - touch ChangeLog # seriously stupid
+    - make install DESTDIR=/tmp/install-root
+    - sudo rsync -a /tmp/install-root/. /
+    - python -b -Wd -m portage.tests.runTests
