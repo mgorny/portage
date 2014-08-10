@@ -44,7 +44,8 @@ epydoc:
 
 test:
 	set -e; \
-	"$(srcdir)/pym/portage/tests/runTests.py"; \
+	cd "$(srcdir)"; \
+	./setup.py test
 
 install:
 	set -e; \

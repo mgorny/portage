@@ -13,10 +13,9 @@ from distutils.command.install_scripts import install_scripts
 from distutils.dir_util import remove_tree
 from distutils.util import change_root
 
-import codecs, collections, glob, os, os.path, re, subprocess
+import codecs, collections, glob, os, os.path, re, subprocess, sys
 
 # TODO:
-# - 'test' command,
 # - smarter rebuilds of docs w/ 'install_docbook' and 'install_epydoc'.
 
 package_name = 'portage'
@@ -194,12 +193,12 @@ class x_build_scripts_portagebin(build_scripts):
 		build_scripts.finalize_options(self)
 		self.build_dir = os.path.join(self.build_dir, 'portage')
 
-	def run(self):
+	def run(self, skip_others=True):
 		# group scripts by subdirectory
 		split_scripts = collections.defaultdict(list)
 		for f in self.scripts:
 			for other_files in x_scripts.values():
-				if f in other_files:
+				if skip_others and f in other_files:
 					break
 			else:
 				dir_name = os.path.dirname(f[len('bin/'):])
@@ -231,30 +230,55 @@ class x_build_scripts(build_scripts):
 
 
 class x_clean(clean):
-	""" clean extended for doc cleaning """
+	""" clean extended for doc & post-test cleaning """
+
+	def clean_docs(self):
+		def get_doc_outfiles():
+			for dirpath, dirnames, filenames in os.walk('doc'):
+				for f in filenames:
+					if f.endswith('.docbook') or f == 'custom.xsl':
+						pass
+					else:
+						yield os.path.join(dirpath, f)
+
+				# do not recurse
+				break
+
+
+		for f in get_doc_outfiles():
+			print('removing %s' % repr(f))
+			os.remove(f)
+
+		if os.path.isdir('epydoc'):
+			remove_tree('epydoc')
+
+	def clean_tests(self):
+		# do not remove incorrect dirs accidentally
+		top_dir = os.path.normpath(os.path.join(self.build_lib, '..'))
+		cprefix = os.path.commonprefix((self.build_base, top_dir))
+		if cprefix != self.build_base:
+			return
+
+		bin_dir = os.path.join(top_dir, 'bin')
+		if os.path.exists(bin_dir):
+			remove_tree(bin_dir)
+
+		conf_dir = os.path.join(top_dir, 'cnf')
+		if os.path.islink(conf_dir):
+			print('removing %s symlink' % repr(conf_dir))
+			os.unlink(conf_dir)
+
+		pni_file = os.path.join(top_dir, '.portage_not_installed')
+		if os.path.exists(pni_file):
+			print('removing %s' % repr(pni_file))
+			os.unlink(pni_file)
 
 	def run(self):
-		clean.run(self)
-
 		if self.all:
-			def get_doc_outfiles():
-				for dirpath, dirnames, filenames in os.walk('doc'):
-					for f in filenames:
-						if f.endswith('.docbook') or f == 'custom.xsl':
-							pass
-						else:
-							yield os.path.join(dirpath, f)
+			self.clean_tests()
+			self.clean_docs()
 
-					# do not recurse
-					break
-
-
-			for f in get_doc_outfiles():
-				print('removing %s' % repr(f))
-				os.remove(f)
-
-			if os.path.isdir('epydoc'):
-				remove_tree('epydoc')
+		clean.run(self)
 
 
 class x_install(install):
@@ -391,6 +415,72 @@ class x_install_scripts(install_scripts):
 		self.run_command('install_scripts_sbin')
 
 
+class build_tests(x_build_scripts_portagebin):
+	""" Prepare build dir for running tests. """
+
+	def initialize_options(self):
+		build_scripts.initialize_options(self)
+		self.build_base = None
+		self.build_lib = None
+
+	def finalize_options(self):
+		build_scripts.finalize_options(self)
+		self.set_undefined_options('build',
+			('build_base', 'build_base'),
+			('build_lib', 'build_lib'))
+
+	def run(self):
+		self.run_command('build_py')
+
+		# since we will be writing to $build_lib/.., it is important
+		# that we do not leave $build_base
+		top_dir = os.path.normpath(os.path.join(self.build_lib, '..'))
+		cprefix = os.path.commonprefix((self.build_base, top_dir))
+		if cprefix != self.build_base:
+			raise SystemError('build_lib must be a subdirectory of build_base')
+
+		# install all scripts $build_lib/../bin
+		# (we can't do a symlink since we want shebangs corrected)
+		self.build_dir = os.path.join(top_dir, 'bin')
+		x_build_scripts_portagebin.run(self, skip_others=False)
+
+		# symlink 'cnf' directory
+		conf_dir = os.path.join(top_dir, 'cnf')
+		if os.path.exists(conf_dir):
+			if not os.path.islink(conf_dir):
+				raise SystemError('%s exists and is not a symlink (collision)'
+					% repr(conf_dir))
+			os.unlink(conf_dir)
+		conf_src = os.path.relpath('cnf', top_dir)
+		print('Symlinking %s -> %s' % (conf_dir, conf_src))
+		os.symlink(conf_src, conf_dir)
+
+		# create $build_lib/../.portage_not_installed
+		# to enable proper paths in tests
+		with open(os.path.join(top_dir, '.portage_not_installed'), 'w') as f:
+			pass
+
+
+class test(Command):
+	""" run tests """
+
+	user_options = []
+
+	def initialize_options(self):
+		self.build_lib = None
+
+	def finalize_options(self):
+		self.set_undefined_options('build',
+			('build_lib', 'build_lib'))
+
+	def run(self):
+		self.run_command('build_tests')
+		subprocess.check_call([
+			sys.executable, '-bWd',
+			os.path.join(self.build_lib, 'portage/tests/runTests.py')
+		])
+
+
 def find_packages():
 	for dirpath, dirnames, filenames in os.walk('pym'):
 		if '__init__.py' in filenames:
@@ -445,6 +535,7 @@ setup(
 			'build_scripts_bin': x_build_scripts_bin,
 			'build_scripts_portagebin': x_build_scripts_portagebin,
 			'build_scripts_sbin': x_build_scripts_sbin,
+			'build_tests': build_tests,
 			'clean': x_clean,
 			'docbook': docbook,
 			'epydoc': epydoc,
@@ -457,6 +548,7 @@ setup(
 			'install_scripts_bin': x_install_scripts_bin,
 			'install_scripts_portagebin': x_install_scripts_portagebin,
 			'install_scripts_sbin': x_install_scripts_sbin,
+			'test': test,
 		},
 
 		classifiers = [
