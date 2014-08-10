@@ -7,7 +7,8 @@ python:
     - 3.4
     - pypy
 script:
+    - ./setup.py test
     - touch ChangeLog # seriously stupid
-    - make install DESTDIR=/tmp/install-root
+    - ./setup.py install --root=/tmp/install-root
     - sudo rsync -a /tmp/install-root/. /
     - python -b -Wd -m portage.tests.runTests
