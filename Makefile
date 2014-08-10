@@ -74,7 +74,8 @@ install:
 
 clean:
 	set -e; \
-	$(MAKE) -C "$(srcdir)/doc" clean; \
-	rm -rf "$(WORKDIR)/epydoc"; \
+	\
+	cd "$(srcdir)"; \
+	./setup.py clean --all
 
 .PHONY: all clean docbook epydoc install test

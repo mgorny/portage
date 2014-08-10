@@ -5,18 +5,19 @@
 
 from distutils.core import setup, Command
 from distutils.command.build_scripts import build_scripts
+from distutils.command.clean import clean
 from distutils.command.install import install
 from distutils.command.install_data import install_data
 from distutils.command.install_lib import install_lib
 from distutils.command.install_scripts import install_scripts
+from distutils.dir_util import remove_tree
 from distutils.util import change_root
 
 import codecs, collections, glob, os, os.path, re, subprocess
 
 # TODO:
-# 1. proper 'clean' command,
-# 2. 'test' command,
-# 3. smarter rebuilds of docs w/ 'install_docbook' and 'install_epydoc'.
+# - 'test' command,
+# - smarter rebuilds of docs w/ 'install_docbook' and 'install_epydoc'.
 
 package_name = 'portage'
 package_version = '2.2.12'
@@ -229,6 +230,33 @@ class x_build_scripts(build_scripts):
 		self.run_command('build_scripts_sbin')
 
 
+class x_clean(clean):
+	""" clean extended for doc cleaning """
+
+	def run(self):
+		clean.run(self)
+
+		if self.all:
+			def get_doc_outfiles():
+				for dirpath, dirnames, filenames in os.walk('doc'):
+					for f in filenames:
+						if f.endswith('.docbook') or f == 'custom.xsl':
+							pass
+						else:
+							yield os.path.join(dirpath, f)
+
+					# do not recurse
+					break
+
+
+			for f in get_doc_outfiles():
+				print('removing %s' % repr(f))
+				os.remove(f)
+
+			if os.path.isdir('epydoc'):
+				remove_tree('epydoc')
+
+
 class x_install(install):
 	""" install command with extra Portage paths """
 
@@ -417,6 +445,7 @@ setup(
 			'build_scripts_bin': x_build_scripts_bin,
 			'build_scripts_portagebin': x_build_scripts_portagebin,
 			'build_scripts_sbin': x_build_scripts_sbin,
+			'clean': x_clean,
 			'docbook': docbook,
 			'epydoc': epydoc,
 			'install': x_install,
