@@ -248,8 +248,10 @@ class x_install(install):
 	""" install command with extra Portage paths """
 
 	user_options = install.user_options + [
-		('prefix=', None, "Main prefix for install"),
-		('exec-prefix=', None, "Executable install prefix"),
+		# note: $prefix and $exec_prefix are reserved for Python install
+		('system-prefix=', None, "Prefix for architecture-independent data"),
+		('system-exec-prefix=', None, "Prefix for architecture-specific data"),
+
 		('bindir=', None, "Install directory for main executables"),
 		('datarootdir=', None, "Data install root directory"),
 		('docdir=', None, "Documentation install directory"),
@@ -264,19 +266,19 @@ class x_install(install):
 
 	# note: the order is important for proper substitution
 	paths = [
-		('prefix', '/usr'),
-		('exec_prefix', '$prefix'),
+		('system_prefix', '/usr'),
+		('system_exec_prefix', '$system_prefix'),
 
-		('bindir', '$exec_prefix/bin'),
-		('sbindir', '$exec_prefix/sbin'),
-		('sysconfdir', '$prefix/etc'),
+		('bindir', '$system_exec_prefix/bin'),
+		('sbindir', '$system_exec_prefix/sbin'),
+		('sysconfdir', '$system_prefix/etc'),
 
-		('datarootdir', '$prefix/share'),
+		('datarootdir', '$system_prefix/share'),
 		('docdir', '$datarootdir/doc/%s-%s' % (package_name, package_version)),
 		('htmldir', '$docdir/html'),
 		('mandir', '$datarootdir/man'),
 
-		('portage_base', '$exec_prefix/lib/portage'),
+		('portage_base', '$system_exec_prefix/lib/portage'),
 		('portage_bindir', '$portage_base/bin'),
 		('portage_datadir', '$datarootdir/portage'),
 
