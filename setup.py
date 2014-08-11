@@ -271,7 +271,7 @@ class x_install(install):
 
 		('bindir', '$system_exec_prefix/bin'),
 		('sbindir', '$system_exec_prefix/sbin'),
-		('sysconfdir', '$system_prefix/etc'),
+		('sysconfdir', '/etc'),
 
 		('datarootdir', '$system_prefix/share'),
 		('docdir', '$datarootdir/doc/%s-%s' % (package_name, package_version)),
