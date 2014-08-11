@@ -11,7 +11,7 @@ from distutils.command.install_data import install_data
 from distutils.command.install_lib import install_lib
 from distutils.command.install_scripts import install_scripts
 from distutils.dir_util import remove_tree
-from distutils.util import change_root
+from distutils.util import change_root, subst_vars
 
 import codecs, collections, glob, os, os.path, re, subprocess, sys
 
@@ -21,19 +21,6 @@ import codecs, collections, glob, os, os.path, re, subprocess, sys
 package_name = 'portage'
 package_version = '2.2.12'
 package_homepage = 'https://wiki.gentoo.org/wiki/Project:Portage'
-
-bindir = '/usr/bin'
-docdir = '/usr/share/doc/%s-%s' % (package_name, package_version)
-htmldir = os.path.join(docdir, 'html')
-mandir = '/usr/share/man'
-sbindir = '/usr/sbin'
-sysconfdir = '/etc'
-logrotatedir = os.path.join(sysconfdir, 'logrotate.d')
-portage_base = '/usr/lib/portage'
-portage_bindir = os.path.join(portage_base, 'bin')
-portage_datadir = '/usr/share/portage'
-portage_confdir = os.path.join(portage_datadir, 'config')
-portage_setsdir = os.path.join(portage_confdir, 'sets')
 
 x_scripts = {
 	'bin': [
@@ -261,7 +248,10 @@ class x_install(install):
 	""" install command with extra Portage paths """
 
 	user_options = install.user_options + [
+		('prefix=', None, "Main prefix for install"),
+		('exec-prefix=', None, "Executable install prefix"),
 		('bindir=', None, "Install directory for main executables"),
+		('datarootdir=', None, "Data install root directory"),
 		('docdir=', None, "Documentation install directory"),
 		('htmldir=', None, "HTML documentation install directory"),
 		('mandir=', None, "Manpage root install directory"),
@@ -272,20 +262,47 @@ class x_install(install):
 		('sysconfdir=', None, 'System configuration path'),
 	]
 
+	# note: the order is important for proper substitution
+	paths = [
+		('prefix', '/usr'),
+		('exec_prefix', '$prefix'),
+
+		('bindir', '$exec_prefix/bin'),
+		('sbindir', '$exec_prefix/sbin'),
+		('sysconfdir', '$prefix/etc'),
+
+		('datarootdir', '$prefix/share'),
+		('docdir', '$datarootdir/doc/%s-%s' % (package_name, package_version)),
+		('htmldir', '$docdir/html'),
+		('mandir', '$datarootdir/man'),
+
+		('portage_base', '$exec_prefix/lib/portage'),
+		('portage_bindir', '$portage_base/bin'),
+		('portage_datadir', '$datarootdir/portage'),
+
+		# not customized at the moment
+		('logrotatedir', '$sysconfdir/logrotate'),
+		('portage_confdir', '$portage_datadir/config'),
+		('portage_setsdir', '$portage_confdir/sets'),
+	]
+
 	def initialize_options(self):
 		install.initialize_options(self)
-		self.bindir = bindir
-		self.docdir = docdir
-		self.htmldir = htmldir
-		self.mandir = mandir
-		self.portage_base = portage_base
-		self.portage_bindir = portage_bindir
-		self.portage_datadir = portage_datadir
-		self.sbindir = sbindir
-		self.sysconfdir = sysconfdir
+
+		for key, default in self.paths:
+			setattr(self, key, default)
+		self.subst_paths = {}
 
 	def finalize_options(self):
 		install.finalize_options(self)
+
+		# substitute variables
+		new_paths = {}
+		for key, default in self.paths:
+			new_paths[key] = subst_vars(getattr(self, key), new_paths)
+			setattr(self, key, new_paths[key])
+		self.subst_paths = new_paths
+
 		# prepend root to bindirs
 		if self.root is not None:
 			self.bindir = change_root(self.root, self.bindir)
@@ -300,36 +317,16 @@ class x_install_data(install_data):
 
 	def initialize_options(self):
 		install_data.initialize_options(self)
-		self.docdir = None
-		self.mandir = None
-		self.portage_datadir = None
-		self.sysconfdir = None
+		self.paths = None
 
 	def finalize_options(self):
 		install_data.finalize_options(self)
 		self.set_undefined_options('install',
-			('docdir', 'docdir'),
-			('mandir', 'mandir'),
-			('portage_datadir', 'portage_datadir'),
-			('sysconfdir', 'sysconfdir'))
+			('subst_paths', 'paths'))
 
-		self.logrotatedir = os.path.join(self.sysconfdir, 'logrotate.d')
-		self.portage_confdir = os.path.join(self.portage_datadir, 'config')
-		self.portage_setsdir = os.path.join(self.portage_confdir, 'sets')
-
-		# substitute default paths in data_files with user-provided paths
-		dir_mapping = {
-			sysconfdir: self.sysconfdir,
-			logrotatedir: self.logrotatedir,
-			portage_confdir: self.portage_confdir,
-			portage_setsdir: self.portage_setsdir,
-			docdir: self.docdir,
-		}
+		# substitute variables in data_files
 		for f in self.data_files:
-			if f[0].startswith(mandir):
-				f[0] = self.mandir + f[0][len(mandir):]
-			else:
-				f[0] = dir_mapping[f[0]]
+			f[0] = subst_vars(f[0], self.paths)
 
 
 class x_install_lib(install_lib):
@@ -340,15 +337,13 @@ class x_install_lib(install_lib):
 	def initialize_options(self):
 		install_lib.initialize_options(self)
 		self.portage_base = None
-		self.portage_datadir = None
+		self.portage_confdir = None
 
 	def finalize_options(self):
 		install_lib.finalize_options(self)
 		self.set_undefined_options('install',
 			('portage_base', 'portage_base'),
-			('portage_datadir', 'portage_datadir'))
-
-		self.portage_confdir = os.path.join(self.portage_datadir, 'config')
+			('portage_confdir', 'portage_confdir'))
 
 	def install(self):
 		ret = install_lib.install(self)
@@ -496,7 +491,7 @@ def get_manpages():
 		topdir = dirpath[len('man/'):]
 		if not topdir or linguas is None or topdir in linguas:
 			for g, mans in groups.items():
-				yield [os.path.join(mandir, topdir, 'man%s' % g), mans]
+				yield [os.path.join('$mandir', topdir, 'man%s' % g), mans]
 
 setup(
 		name = package_name,
@@ -511,12 +506,12 @@ setup(
 		scripts = list(find_scripts()),
 
 		data_files = list(get_manpages()) + [
-			[sysconfdir, ['cnf/etc-update.conf', 'cnf/dispatch-conf.conf']],
-			[logrotatedir, ['cnf/logrotate.d/elog-save-summary']],
-			[portage_confdir, [
+			['$sysconfdir', ['cnf/etc-update.conf', 'cnf/dispatch-conf.conf']],
+			['$logrotatedir', ['cnf/logrotate.d/elog-save-summary']],
+			['$portage_confdir', [
 				'cnf/make.conf.example', 'cnf/make.globals', 'cnf/repos.conf']],
-			[portage_setsdir, ['cnf/sets/portage.conf']],
-			[docdir, ['ChangeLog', 'NEWS', 'RELEASE-NOTES']],
+			['$portage_setsdir', ['cnf/sets/portage.conf']],
+			['$docdir', ['ChangeLog', 'NEWS', 'RELEASE-NOTES']],
 		],
 
 		cmdclass = {
