@@ -35,18 +35,6 @@ portage_datadir = '/usr/share/portage'
 portage_confdir = os.path.join(portage_datadir, 'config')
 portage_setsdir = os.path.join(portage_confdir, 'sets')
 
-extra_install_options = [
-	('bindir=', None, "Install directory for main executables"),
-	('docdir=', None, "Documentation install directory"),
-	('htmldir=', None, "HTML documentation install directory"),
-	('mandir=', None, "Manpage root install directory"),
-	('portage-base=', 'b', "Portage install base"),
-	('portage-bindir=', None, "Install directory for Portage internal-use executables"),
-	('portage-datadir=', None, 'Install directory for data files'),
-	('sbindir=', None, "Install directory for superuser-intended executables"),
-	('sysconfdir=', None, 'System configuration path'),
-]
-
 extra_install_option_mapping = [
 	('docdir', 'docdir'),
 	('mandir', 'mandir'),
@@ -128,9 +116,7 @@ class epydoc(Command):
 class install_docbook(install_data):
 	""" install_data for docbook docs """
 
-	user_options = install_data.user_options + [
-		('htmldir=', None, "HTML documentation install directory"),
-	]
+	user_options = install_data.user_options
 
 	def initialize_options(self):
 		install_data.initialize_options(self)
@@ -152,9 +138,7 @@ class install_docbook(install_data):
 class install_epydoc(install_data):
 	""" install_data for epydoc docs """
 
-	user_options = install_data.user_options + [
-		('htmldir=', None, "HTML documentation install directory"),
-	]
+	user_options = install_data.user_options
 
 	def initialize_options(self):
 		install_data.initialize_options(self)
@@ -284,7 +268,17 @@ class x_clean(clean):
 class x_install(install):
 	""" install command with extra Portage paths """
 
-	user_options = install.user_options + extra_install_options
+	user_options = install.user_options + [
+		('bindir=', None, "Install directory for main executables"),
+		('docdir=', None, "Documentation install directory"),
+		('htmldir=', None, "HTML documentation install directory"),
+		('mandir=', None, "Manpage root install directory"),
+		('portage-base=', 'b', "Portage install base"),
+		('portage-bindir=', None, "Install directory for Portage internal-use executables"),
+		('portage-datadir=', None, 'Install directory for data files'),
+		('sbindir=', None, "Install directory for superuser-intended executables"),
+		('sysconfdir=', None, 'System configuration path'),
+	]
 
 	def initialize_options(self):
 		install.initialize_options(self)
@@ -310,7 +304,7 @@ class x_install(install):
 class x_install_data(install_data):
 	""" install_data with customized path support """
 
-	user_options = install_data.user_options + extra_install_options
+	user_options = install_data.user_options
 
 	def initialize_options(self):
 		install_data.initialize_options(self)
@@ -346,7 +340,7 @@ class x_install_data(install_data):
 class x_install_lib(install_lib):
 	""" install_lib command with Portage path substitution """
 
-	user_options = install_lib.user_options + extra_install_options
+	user_options = install_lib.user_options
 
 	def initialize_options(self):
 		install_lib.initialize_options(self)
