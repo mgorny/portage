@@ -35,14 +35,6 @@ portage_datadir = '/usr/share/portage'
 portage_confdir = os.path.join(portage_datadir, 'config')
 portage_setsdir = os.path.join(portage_confdir, 'sets')
 
-extra_install_option_mapping = [
-	('docdir', 'docdir'),
-	('mandir', 'mandir'),
-	('portage_base', 'portage_base'),
-	('portage_datadir', 'portage_datadir'),
-	('sysconfdir', 'sysconfdir'),
-]
-
 x_scripts = {
 	'bin': [
 		'bin/ebuild', 'bin/egencache', 'bin/emerge', 'bin/emerge-webrsync',
@@ -310,13 +302,16 @@ class x_install_data(install_data):
 		install_data.initialize_options(self)
 		self.docdir = None
 		self.mandir = None
-		self.portage_base = None
 		self.portage_datadir = None
 		self.sysconfdir = None
 
 	def finalize_options(self):
 		install_data.finalize_options(self)
-		self.set_undefined_options('install', *extra_install_option_mapping)
+		self.set_undefined_options('install',
+			('docdir', 'docdir'),
+			('mandir', 'mandir'),
+			('portage_datadir', 'portage_datadir'),
+			('sysconfdir', 'sysconfdir'))
 
 		self.logrotatedir = os.path.join(self.sysconfdir, 'logrotate.d')
 		self.portage_confdir = os.path.join(self.portage_datadir, 'config')
@@ -344,15 +339,14 @@ class x_install_lib(install_lib):
 
 	def initialize_options(self):
 		install_lib.initialize_options(self)
-		self.docdir = None
-		self.mandir = None
 		self.portage_base = None
 		self.portage_datadir = None
-		self.sysconfdir = None
 
 	def finalize_options(self):
 		install_lib.finalize_options(self)
-		self.set_undefined_options('install', *extra_install_option_mapping)
+		self.set_undefined_options('install',
+			('portage_base', 'portage_base'),
+			('portage_datadir', 'portage_datadir'))
 
 		self.portage_confdir = os.path.join(self.portage_datadir, 'config')
 
