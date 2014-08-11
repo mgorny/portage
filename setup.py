@@ -152,33 +152,21 @@ class install_epydoc(install_data):
 class x_build_scripts_custom(build_scripts):
 	def finalize_options(self):
 		build_scripts.finalize_options(self)
-		self.build_dir = os.path.join(self.build_dir, self.dir_name)
-		self.scripts = x_scripts[self.dir_name]
+		if 'dir_name' in dir(self):
+			self.build_dir = os.path.join(self.build_dir, self.dir_name)
+			if self.dir_name in x_scripts:
+				self.scripts = x_scripts[self.dir_name]
+			else:
+				self.scripts = set(self.scripts)
+				for other_files in x_scripts.values():
+					self.scripts.difference_update(other_files)
 
-
-class x_build_scripts_bin(x_build_scripts_custom):
-	dir_name = 'bin'
-
-
-class x_build_scripts_sbin(x_build_scripts_custom):
-	dir_name = 'sbin'
-
-
-class x_build_scripts_portagebin(build_scripts):
-	def finalize_options(self):
-		build_scripts.finalize_options(self)
-		self.build_dir = os.path.join(self.build_dir, 'portage')
-
-	def run(self, skip_others=True):
+	def run(self):
 		# group scripts by subdirectory
 		split_scripts = collections.defaultdict(list)
 		for f in self.scripts:
-			for other_files in x_scripts.values():
-				if skip_others and f in other_files:
-					break
-			else:
-				dir_name = os.path.dirname(f[len('bin/'):])
-				split_scripts[dir_name].append(f)
+			dir_name = os.path.dirname(f[len('bin/'):])
+			split_scripts[dir_name].append(f)
 
 		base_dir = self.build_dir
 		base_scripts = self.scripts
@@ -190,6 +178,18 @@ class x_build_scripts_portagebin(build_scripts):
 		# restore previous values
 		self.build_dir = base_dir
 		self.scripts = base_scripts
+
+
+class x_build_scripts_bin(x_build_scripts_custom):
+	dir_name = 'bin'
+
+
+class x_build_scripts_sbin(x_build_scripts_custom):
+	dir_name = 'sbin'
+
+
+class x_build_scripts_portagebin(x_build_scripts_custom):
+	dir_name = 'portage'
 
 
 class x_build_scripts(build_scripts):
@@ -403,49 +403,50 @@ class x_install_scripts(install_scripts):
 		self.run_command('install_scripts_sbin')
 
 
-class build_tests(x_build_scripts_portagebin):
+class build_tests(x_build_scripts_custom):
 	""" Prepare build dir for running tests. """
 
 	def initialize_options(self):
-		build_scripts.initialize_options(self)
+		x_build_scripts_custom.initialize_options(self)
 		self.build_base = None
 		self.build_lib = None
 
 	def finalize_options(self):
-		build_scripts.finalize_options(self)
+		x_build_scripts_custom.finalize_options(self)
 		self.set_undefined_options('build',
 			('build_base', 'build_base'),
 			('build_lib', 'build_lib'))
 
-	def run(self):
-		self.run_command('build_py')
-
 		# since we will be writing to $build_lib/.., it is important
 		# that we do not leave $build_base
-		top_dir = os.path.normpath(os.path.join(self.build_lib, '..'))
-		cprefix = os.path.commonprefix((self.build_base, top_dir))
+		self.top_dir = os.path.normpath(os.path.join(self.build_lib, '..'))
+		cprefix = os.path.commonprefix((self.build_base, self.top_dir))
 		if cprefix != self.build_base:
 			raise SystemError('build_lib must be a subdirectory of build_base')
 
+		self.build_dir = os.path.join(self.top_dir, 'bin')
+
+	def run(self):
+		self.run_command('build_py')
+
 		# install all scripts $build_lib/../bin
 		# (we can't do a symlink since we want shebangs corrected)
-		self.build_dir = os.path.join(top_dir, 'bin')
-		x_build_scripts_portagebin.run(self, skip_others=False)
+		x_build_scripts_custom.run(self)
 
 		# symlink 'cnf' directory
-		conf_dir = os.path.join(top_dir, 'cnf')
+		conf_dir = os.path.join(self.top_dir, 'cnf')
 		if os.path.exists(conf_dir):
 			if not os.path.islink(conf_dir):
 				raise SystemError('%s exists and is not a symlink (collision)'
 					% repr(conf_dir))
 			os.unlink(conf_dir)
-		conf_src = os.path.relpath('cnf', top_dir)
+		conf_src = os.path.relpath('cnf', self.top_dir)
 		print('Symlinking %s -> %s' % (conf_dir, conf_src))
 		os.symlink(conf_src, conf_dir)
 
 		# create $build_lib/../.portage_not_installed
 		# to enable proper paths in tests
-		with open(os.path.join(top_dir, '.portage_not_installed'), 'w') as f:
+		with open(os.path.join(self.top_dir, '.portage_not_installed'), 'w') as f:
 			pass
 
 
