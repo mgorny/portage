@@ -305,12 +305,6 @@ class x_install(install):
 			setattr(self, key, new_paths[key])
 		self.subst_paths = new_paths
 
-		# prepend root to bindirs
-		if self.root is not None:
-			self.bindir = change_root(self.root, self.bindir)
-			self.sbindir = change_root(self.root, self.sbindir)
-			self.portage_bindir = change_root(self.root, self.portage_bindir)
-
 
 class x_install_data(install_data):
 	""" install_data with customized path support """
@@ -339,18 +333,21 @@ class x_install_lib(install_lib):
 	def initialize_options(self):
 		install_lib.initialize_options(self)
 		self.portage_base = None
+		self.portage_bindir = None
 		self.portage_confdir = None
 
 	def finalize_options(self):
 		install_lib.finalize_options(self)
 		self.set_undefined_options('install',
 			('portage_base', 'portage_base'),
+			('portage_bindir', 'portage_bindir'),
 			('portage_confdir', 'portage_confdir'))
 
 	def install(self):
 		ret = install_lib.install(self)
 
 		base_re = re.compile(r'(^PORTAGE_BASE_PATH.*=) .*$', re.MULTILINE)
+		portage_bin_re = re.compile(r'(^PORTAGE_BIN_PATH.*=) .*$', re.MULTILINE)
 		global_config_re = re.compile(r'(^GLOBAL_CONFIG_PATH.*=) .*$', re.MULTILINE)
 
 		constfile = os.path.join(self.install_dir, 'portage', 'const.py')
@@ -358,6 +355,7 @@ class x_install_lib(install_lib):
 		with codecs.open(constfile, 'r', 'utf-8') as f:
 			data = f.read()
 		data = base_re.sub('\\1 %s' % repr(self.portage_base), data)
+		data = portage_bin_re.sub('\\1 %s' % repr(self.portage_bindir), data)
 		data = global_config_re.sub('\\1 %s' % repr(self.portage_confdir), data)
 		with codecs.open(constfile, 'w', 'utf-8') as f:
 			f.write(data)
@@ -366,10 +364,20 @@ class x_install_lib(install_lib):
 
 
 class x_install_scripts_custom(install_scripts):
+	def initialize_options(self):
+		install_scripts.initialize_options(self)
+		self.root = None
+
 	def finalize_options(self):
-		self.set_undefined_options('install', (self.var_name, 'install_dir'))
+		self.set_undefined_options('install',
+			('root', 'root'),
+			(self.var_name, 'install_dir'))
 		install_scripts.finalize_options(self)
 		self.build_dir = os.path.join(self.build_dir, self.dir_name)
+
+		# prepend root
+		if self.root is not None:
+			self.install_dir = change_root(self.root, self.install_dir)
 
 
 class x_install_scripts_bin(x_install_scripts_custom):
