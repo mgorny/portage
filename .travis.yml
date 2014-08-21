@@ -7,4 +7,8 @@ python:
     - 3.4
     - pypy
 script:
-    - python -b -Wd pym/portage/tests/runTests
+    - ./setup.py test
+    - touch ChangeLog # seriously stupid
+    - ./setup.py install --root=/tmp/install-root
+    - sudo rsync -a /tmp/install-root/. /
+    - python -b -Wd -m portage.tests.runTests
