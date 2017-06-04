@@ -123,7 +123,7 @@ def _get_eapi_attrs(eapi):
 		exports_EBUILD_PHASE_FUNC = (eapi is None or eapi_exports_EBUILD_PHASE_FUNC(eapi)),
 		exports_PORTDIR = (eapi is not None and eapi_exports_PORTDIR(eapi)),
 		exports_ECLASSDIR = (eapi is not None and eapi_exports_ECLASSDIR(eapi)),
-		feature_flag_test = True,
+		feature_flag_test = False,
 		iuse_defaults = (eapi is None or eapi_has_iuse_defaults(eapi)),
 		iuse_effective = (eapi is not None and eapi_has_iuse_effective(eapi)),
 		path_variables_end_with_trailing_slash = (eapi is not None and

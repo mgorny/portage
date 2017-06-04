@@ -286,6 +286,7 @@ class config(object):
 			self.configlist = [
 				self.configdict['env.d'],
 				self.configdict['repo'],
+				self.configdict['featurestest'],
 				self.configdict['pkginternal'],
 				self.configdict['globals'],
 				self.configdict['defaults'],
@@ -449,12 +450,15 @@ class config(object):
 			# back up our incremental variables:
 			self.configdict={}
 			self._use_expand_dict = {}
-			# configlist will contain: [ env.d, globals, defaults, conf, pkg, backupenv, env ]
+			# configlist will contain: [ env.d, globals, featurestest, defaults, conf, pkg, backupenv, env ]
 			self.configlist.append({})
 			self.configdict["env.d"] = self.configlist[-1]
 
 			self.configlist.append({})
 			self.configdict["repo"] = self.configlist[-1]
+
+			self.configlist.append({})
+			self.configdict["featurestest"] = self.configlist[-1]
 
 			self.configlist.append({})
 			self.configdict["pkginternal"] = self.configlist[-1]
@@ -832,7 +836,7 @@ class config(object):
 			# reasonable defaults; this is important as without USE_ORDER,
 			# USE will always be "" (nothing set)!
 			if "USE_ORDER" not in self:
-				self["USE_ORDER"] = "env:pkg:conf:defaults:pkginternal:repo:env.d"
+				self["USE_ORDER"] = "env:pkg:conf:defaults:pkginternal:featurestest:repo:env.d"
 				self.backup_changes("USE_ORDER")
 
 			if "CBUILD" not in self and "CHOST" in self:
@@ -1253,6 +1257,7 @@ class config(object):
 			del self._penv[:]
 			self.configdict["pkg"].clear()
 			self.configdict["pkginternal"].clear()
+			self.configdict["featurestest"].clear()
 			self.configdict["repo"].clear()
 			self.configdict["defaults"]["USE"] = \
 				" ".join(self.make_defaults_use)
@@ -1413,6 +1418,7 @@ class config(object):
 		cp = cpv_getkey(mycpv)
 		cpv_slot = self.mycpv
 		pkginternaluse = ""
+		use_test = ""
 		iuse = ""
 		pkg_configdict = self.configdict["pkg"]
 		previous_iuse = pkg_configdict.get("IUSE")
@@ -1480,6 +1486,21 @@ class config(object):
 
 		if pkginternaluse != self.configdict["pkginternal"].get("USE", ""):
 			self.configdict["pkginternal"]["USE"] = pkginternaluse
+			has_changed = True
+
+		if explicit_iuse is None:
+			explicit_iuse = frozenset(x.lstrip("+-") for x in iuse.split())
+		if eapi_attrs.iuse_effective:
+			iuse_implicit_match = self._iuse_effective_match
+		else:
+			iuse_implicit_match = self._iuse_implicit_match
+
+		if "test" in explicit_iuse or iuse_implicit_match("test"):
+			if "test" in self.features:
+				use_test = "test"
+
+		if use_test != self.configdict["featurestest"].get("USE", ""):
+			self.configdict["featurestest"]["USE"] = use_test
 			has_changed = True
 
 		repo_env = []
@@ -1640,11 +1661,8 @@ class config(object):
 		# package has different IUSE.
 		use = set(self["USE"].split())
 		unfiltered_use = frozenset(use)
-		if explicit_iuse is None:
-			explicit_iuse = frozenset(x.lstrip("+-") for x in iuse.split())
 
 		if eapi_attrs.iuse_effective:
-			iuse_implicit_match = self._iuse_effective_match
 			portage_iuse = set(self._iuse_effective)
 			portage_iuse.update(explicit_iuse)
 			if built_use is not None:
@@ -1656,7 +1674,6 @@ class config(object):
 			self.configdict["pkg"]["IUSE_EFFECTIVE"] = \
 				" ".join(sorted(portage_iuse))
 		else:
-			iuse_implicit_match = self._iuse_implicit_match
 			portage_iuse = self._get_implicit_iuse()
 			portage_iuse.update(explicit_iuse)
 
@@ -1692,21 +1709,17 @@ class config(object):
 			self.get("EBUILD_FORCE_TEST") == "1"
 
 		if "test" in explicit_iuse or iuse_implicit_match("test"):
-			if "test" not in self.features:
-				use.discard("test")
-			elif restrict_test or \
+			if "test" in self.features:
+				if ebuild_force_test and "test" in self.usemask:
+					self.usemask = \
+						frozenset(x for x in self.usemask if x != "test")
+			if restrict_test or \
 				("test" in self.usemask and not ebuild_force_test):
 				# "test" is in IUSE and USE=test is masked, so execution
 				# of src_test() probably is not reliable. Therefore,
 				# temporarily disable FEATURES=test just for this package.
 				self["FEATURES"] = " ".join(x for x in self.features \
 					if x != "test")
-				use.discard("test")
-			else:
-				use.add("test")
-				if ebuild_force_test and "test" in self.usemask:
-					self.usemask = \
-						frozenset(x for x in self.usemask if x != "test")
 
 		# Allow _* flags from USE_EXPAND wildcards to pass through here.
 		use.difference_update([x for x in use \
@@ -1855,12 +1868,6 @@ class config(object):
 		# build and bootstrap flags used by bootstrap.sh
 		iuse_implicit.add("build")
 		iuse_implicit.add("bootstrap")
-
-		# Controlled by FEATURES=test. Make this implicit, so handling
-		# of FEATURES=test is consistent regardless of explicit IUSE.
-		# Users may use use.mask/package.use.mask to control
-		# FEATURES=test for all ebuilds, regardless of explicit IUSE.
-		iuse_implicit.add("test")
 
 		return iuse_implicit
 
