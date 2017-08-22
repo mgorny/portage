@@ -24,6 +24,10 @@ target="${1}"
 # DEPRECATED HACK: when absolute, prefix with offset for Gentoo Prefix
 # (but only if ${EPREFIX} is not there already)
 # this will eventually be removed, #615594
+if [[ ${target:0:1} == / ]]; then
+	eqawarn "dosym: absolute symlink ${2} -> ${target}"
+	eqawarn "likely want: $(python -c 'import os.path, sys; print(os.path.relpath(*sys.argv[1:]));' "${target}" "${destdir}")"
+fi
 if [[ ${target:0:1} == "/" && ${target}/ != "${EPREFIX}"/* ]]; then
 	eqawarn "dosym: prepending EPREFIX to path implicitly. If this is desired,"
 	eqawarn "       please fix the ebuild to use \${EPREFIX} explicitly."
