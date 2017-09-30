@@ -327,6 +327,7 @@ class config(object):
 			config_root = locations_manager.config_root
 			sysroot = locations_manager.sysroot
 			esysroot = locations_manager.esysroot
+			broot = locations_manager.broot
 			abs_user_config = locations_manager.abs_user_config
 
 			make_conf = getconfig(
@@ -474,6 +475,7 @@ class config(object):
 			self["EPREFIX"] = eprefix
 			self["EROOT"] = eroot
 			self["ESYSROOT"] = esysroot
+			self["BROOT"] = broot
 			known_repos = []
 			portdir = ""
 			portdir_overlay = ""
@@ -642,6 +644,8 @@ class config(object):
 			self.backup_changes("EROOT")
 			self["ESYSROOT"] = esysroot
 			self.backup_changes("ESYSROOT")
+			self["BROOT"] = broot
+			self.backup_changes("BROOT")
 
 			# The prefix of the running portage instance is used in the
 			# ebuild environment to implement the --host-root option for
@@ -2711,6 +2715,9 @@ class config(object):
 		if not (src_phase and eapi_attrs.sysroot):
 			mydict.pop("ESYSROOT", None)
 
+		if not (src_phase and eapi_attrs.broot):
+			mydict.pop("BROOT", None)
+
 		# Prefix variables are supported beginning with EAPI 3, or when
 		# force-prefix is in FEATURES, since older EAPIs would otherwise be
 		# useless with prefix configurations. This brings compatibility with
@@ -2759,7 +2766,8 @@ class config(object):
 			mydict.pop("ECLASSDIR", None)
 
 		if not eapi_attrs.path_variables_end_with_trailing_slash:
-			for v in ("D", "ED", "ROOT", "EROOT", "SYSROOT", "ESYSROOT"):
+			for v in ("D", "ED", "ROOT", "EROOT", "SYSROOT", "ESYSROOT",
+					"BROOT"):
 				if v in mydict:
 					mydict[v] = mydict[v].rstrip(os.path.sep)
 

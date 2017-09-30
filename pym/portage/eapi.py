@@ -92,13 +92,17 @@ def eapi_empty_groups_always_true(eapi):
 def eapi_path_variables_end_with_trailing_slash(eapi):
 	return eapi in ("0", "1", "2", "3", "4", "5", "6")
 
+def eapi_has_broot(eapi):
+	return eapi not in ("0", "1", "2", "3", "4", "4-python", "4-slot-abi",
+			"5", "5-progress", "5-hdepend", "6")
+
 def eapi_has_sysroot(eapi):
 	return eapi not in ("0", "1", "2", "3", "4", "4-python", "4-slot-abi",
 			"5", "5-progress", "5-hdepend", "6")
 
 _eapi_attrs = collections.namedtuple('_eapi_attrs',
 	'allows_package_provided '
-	'bdepend exports_EBUILD_PHASE_FUNC '
+	'bdepend broot exports_EBUILD_PHASE_FUNC '
 	'exports_PORTDIR exports_ECLASSDIR '
 	'iuse_defaults iuse_effective posixish_locale '
 	'path_variables_end_with_trailing_slash '
@@ -127,6 +131,7 @@ def _get_eapi_attrs(eapi):
 	eapi_attrs = _eapi_attrs(
 		allows_package_provided=(eapi is None or eapi_allows_package_provided(eapi)),
 		bdepend = (eapi is not None and eapi_has_bdepend(eapi)),
+		broot = (eapi is None or eapi_has_broot(eapi)),
 		empty_groups_always_true = (eapi is not None and eapi_empty_groups_always_true(eapi)),
 		exports_EBUILD_PHASE_FUNC = (eapi is None or eapi_exports_EBUILD_PHASE_FUNC(eapi)),
 		exports_PORTDIR = (eapi is not None and eapi_exports_PORTDIR(eapi)),
