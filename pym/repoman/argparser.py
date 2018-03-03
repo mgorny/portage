@@ -167,7 +167,7 @@ def parse_args(argv, qahelp, repoman_default_opts):
 
 	parser.add_argument(
 		'-e', '--include-exp-profiles', choices=('y', 'n'), metavar='<y|n>',
-		default=False,
+		default='n',
 		help='include exp profiles in dependency checks')
 
 	parser.add_argument(
