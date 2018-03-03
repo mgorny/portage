@@ -51,6 +51,10 @@ qahelp = {
 	"dependency.badtilde": (
 		"Uses the ~ dep operator with a non-zero revision part,"
 		" which is useless (the revision is ignored)"),
+	"dependency.equalsversion": (
+		"Suspicious =-dependency with a specific version and no rev. "
+		"Please either use ~ if any revision is acceptable, or append "
+		"-r0 to silence the warning."),
 	"dependency.missingslot": (
 		"RDEPEND matches more than one SLOT but does not specify a "
 		"slot and/or use the := or :* slot operator"),
@@ -253,6 +257,7 @@ qawarnings = set((
 	"dependency.badinexp",
 	"dependency.badmaskedinexp",
 	"dependency.badtilde",
+	"dependency.equalsversion",
 	"dependency.missingslot",
 	"dependency.perlcore",
 	"DESCRIPTION.toolong",
