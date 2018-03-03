@@ -162,8 +162,8 @@ def parse_args(argv, qahelp, repoman_default_opts):
 
 	parser.add_argument(
 		'-d', '--include-dev', dest='include_dev', action='store_true',
-		default=False,
-		help='include dev profiles in dependency checks')
+		default=True,
+		help='(no-op, preserved for backwards compatibility)')
 
 	parser.add_argument(
 		'-e', '--include-exp-profiles', choices=('y', 'n'), metavar='<y|n>',
