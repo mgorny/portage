@@ -56,8 +56,6 @@ More information
 
 -DEVELOPING contains some code guidelines.
 -LICENSE contains the GNU General Public License version 2.
--NEWS contains new features/major bug fixes for each version.
--RELEASE NOTES contains mainly upgrade information for each version.
 -TEST-NOTES contains Portage unit test information.
 
 

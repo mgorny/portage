@@ -478,7 +478,6 @@ setup(
 	scripts = list(find_scripts()),
 
 	data_files = list(get_manpages()) + [
-		['$docdir', ['NEWS', 'RELEASE-NOTES']],
 	],
 
 	cmdclass = {
