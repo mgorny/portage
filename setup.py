@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright 1998-2014 Gentoo Foundation
+# Copyright 1998-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 from __future__ import print_function
@@ -30,7 +30,7 @@ import sys
 
 
 # TODO:
-# - smarter rebuilds of docs w/ 'install_docbook' and 'install_epydoc'.
+# - smarter rebuilds of docs w/ 'install_docbook'.
 
 # Dictionary of scripts.  The structure is
 #   key   = location in filesystem to install the scripts
@@ -135,41 +135,6 @@ class docbook(Command):
 				'-m', 'doc/custom.xsl', f, 'doc/portage.docbook'])
 
 
-class epydoc(Command):
-	""" Build API docs using epydoc. """
-
-	user_options = [
-	]
-
-	def initialize_options(self):
-		self.build_lib = None
-
-	def finalize_options(self):
-		self.set_undefined_options('build_py', ('build_lib', 'build_lib'))
-
-	def run(self):
-		self.run_command('build_py')
-
-		print('Building API documentation...')
-
-		process_env = os.environ.copy()
-		pythonpath = self.build_lib
-		try:
-			pythonpath += ':' + process_env['PYTHONPATH']
-		except KeyError:
-			pass
-		process_env['PYTHONPATH'] = pythonpath
-
-		subprocess.check_call(['epydoc', '-o', 'epydoc',
-			'--name', self.distribution.get_name(),
-			'--url', self.distribution.get_url(),
-			'-qq', '--no-frames', '--show-imports',
-			'--exclude', 'portage.tests',
-			'_emerge', 'portage'],
-			env = process_env)
-		os.remove('epydoc/api-objects.txt')
-
-
 class install_docbook(install_data):
 	""" install_data for docbook docs """
 
@@ -190,30 +155,6 @@ class install_docbook(install_data):
 			self.run_command('docbook')
 		self.data_files = [
 			(self.htmldir, glob.glob('doc/*.html')),
-		]
-		install_data.run(self)
-
-
-class install_epydoc(install_data):
-	""" install_data for epydoc docs """
-
-	user_options = install_data.user_options + [
-		('htmldir=', None, "HTML documentation install directory"),
-	]
-
-	def initialize_options(self):
-		install_data.initialize_options(self)
-		self.htmldir = None
-
-	def finalize_options(self):
-		self.set_undefined_options('install', ('htmldir', 'htmldir'))
-		install_data.finalize_options(self)
-
-	def run(self):
-		if not os.path.exists('epydoc/index.html'):
-			self.run_command('epydoc')
-		self.data_files = [
-			(os.path.join(self.htmldir, 'api'), glob.glob('epydoc/*')),
 		]
 		install_data.run(self)
 
@@ -297,9 +238,6 @@ class x_clean(clean):
 
 		if os.path.isdir('doc/fragment'):
 			remove_tree('doc/fragment')
-
-		if os.path.isdir('epydoc'):
-			remove_tree('epydoc')
 
 	def clean_tests(self):
 		# do not remove incorrect dirs accidentally
@@ -699,11 +637,9 @@ setup(
 		'build_tests': build_tests,
 		'clean': x_clean,
 		'docbook': docbook,
-		'epydoc': epydoc,
 		'install': x_install,
 		'install_data': x_install_data,
 		'install_docbook': install_docbook,
-		'install_epydoc': install_epydoc,
 		'install_lib': x_install_lib,
 		'install_scripts': x_install_scripts,
 		'install_scripts_bin': x_install_scripts_bin,
