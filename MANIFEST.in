@@ -11,3 +11,6 @@ include .portage_not_installed
 
 # extra scripts
 include misc/*
+
+# for the tests
+include cnf/metadata.xsd

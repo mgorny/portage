@@ -28,7 +28,7 @@ VERSION = "HEAD"
 
 REPOMAN_BASE_PATH = os.path.join(os.sep, os.sep.join(os.path.realpath(__file__.rstrip("co")).split(os.sep)[:-3]))
 
-_not_installed = os.path.isfile(os.path.join(REPOMAN_BASE_PATH, ".repoman_not_installed"))
+_not_installed = os.path.isfile(os.path.join(REPOMAN_BASE_PATH, ".portage_not_installed"))
 
 if VERSION == 'HEAD':
 	class _LazyVersion(proxy.objectproxy.ObjectProxy):

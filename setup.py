@@ -35,7 +35,7 @@ import sys
 x_scripts = {
 	'bin': [
 		'bin/ebuild', 'bin/egencache', 'bin/emerge', 'bin/emerge-webrsync',
-		'bin/emirrordist', 'bin/portageq', 'bin/quickpkg',
+		'bin/emirrordist', 'bin/portageq', 'bin/quickpkg', 'bin/repoman',
 	],
 	'sbin': [
 		'bin/archive-conf', 'bin/dispatch-conf', 'bin/emaint', 'bin/env-update',
@@ -336,6 +336,9 @@ class x_install_lib(install_lib):
 				f.write(data)
 
 		rewrite_file('portage/__init__.py', {
+			'VERSION': self.distribution.get_version(),
+		})
+		rewrite_file('repoman/__init__.py', {
 			'VERSION': self.distribution.get_version(),
 		})
 		rewrite_file('portage/const.py', {
