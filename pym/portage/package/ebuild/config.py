@@ -70,22 +70,6 @@ if sys.hexversion >= 0x3000000:
 	# pylint: disable=W0622
 	basestring = str
 
-_feature_flags_cache = {}
-
-def _get_feature_flags(eapi_attrs):
-	cache_key = (eapi_attrs.feature_flag_test,)
-	flags = _feature_flags_cache.get(cache_key)
-	if flags is not None:
-		return flags
-
-	flags = []
-	if eapi_attrs.feature_flag_test:
-		flags.append("test")
-
-	flags = frozenset(flags)
-	_feature_flags_cache[cache_key] = flags
-	return flags
-
 def autouse(myvartree, use_cache=1, mysettings=None):
 	warnings.warn("portage.autouse() is deprecated",
 		DeprecationWarning, stacklevel=2)

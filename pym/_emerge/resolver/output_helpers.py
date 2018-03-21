@@ -237,7 +237,7 @@ class _DisplayConfig(object):
 
 def _create_use_string(conf, name, cur_iuse, iuse_forced, cur_use,
 	old_iuse, old_use,
-	is_new, feature_flags, reinst_flags):
+	is_new, reinst_flags):
 
 	if not conf.print_use_string:
 		return ""
@@ -289,9 +289,7 @@ def _create_use_string(conf, name, cur_iuse, iuse_forced, cur_use,
 			elif flag in old_use:
 				flag_str = green("-" + flag) + "*"
 		if flag_str:
-			if flag in feature_flags:
-				flag_str = "{" + flag_str + "}"
-			elif flag in iuse_forced:
+			if flag in iuse_forced:
 				flag_str = "(" + flag_str + ")"
 			if isEnabled:
 				enabled.append(flag_str)
