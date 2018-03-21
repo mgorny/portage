@@ -528,9 +528,11 @@ class build_ext(_build_ext):
 setup(
 	name = 'portage',
 	version = '2.3.24',
-	url = 'https://wiki.gentoo.org/wiki/Project:Portage',
-	author = 'Gentoo Portage Development Team',
+	url = 'https://github.com/mgorny/portage',
+	author = 'Gentoo Portage Development Team and Michał Górny',
 	author_email = 'dev-portage@gentoo.org',
+	maintainer = 'Michał Górny',
+	maintainer_email = 'mgorny@gentoo.org',
 
 	package_dir = {'': 'pym'},
 	packages = list(find_packages()),
