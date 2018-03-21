@@ -15,13 +15,11 @@
 
 find_empty_dirs() {
 	local warn_dirs=()
-	local d striparg=
-
-	[[ ${FEATURES} == *strict-keepdir* ]] && striparg=-delete
+	local d
 
 	while IFS= read -r -d $'\0' d; do
 		[[ ${d} == ${ED%/}/var/* ]] && warn_dirs+=( "${d}" )
-	done < <(find "${ED}" -depth -mindepth 1 -type d -empty -print0 ${striparg} | LC_COLLATE=C sort -z)
+	done < <(find "${ED}" -depth -mindepth 1 -type d -empty -print0 -delete | LC_COLLATE=C sort -z)
 
 	if [[ ${warn_dirs[@]} ]]; then
 		eqawarn "One or more empty directories installed to /var:"
