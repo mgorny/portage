@@ -180,10 +180,6 @@ ___eapi_enables_failglob_in_global_scope() {
 	[[ ! ${1-${EAPI-0}} =~ ^(0|1|2|3|4|5)$ ]]
 }
 
-___eapi_enables_globstar() {
-	false
-}
-
 ___eapi_bash_3_2() {
 	[[ ${1-${EAPI-0}} =~ ^(0|1|2|3|4|5)$ ]]
 }

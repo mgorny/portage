@@ -579,10 +579,6 @@ if ! has "$EBUILD_PHASE" clean cleanrm depend && \
 	[[ -n $EAPI ]] || EAPI=0
 fi
 
-if ___eapi_enables_globstar; then
-	shopt -s globstar
-fi
-
 # Convert quoted paths to array.
 eval "PORTAGE_ECLASS_LOCATIONS=(${PORTAGE_ECLASS_LOCATIONS})"
 
