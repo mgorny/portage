@@ -3290,17 +3290,15 @@ class depgraph(object):
 			# dependencies, so it's safe to discard them early.
 			edepend["DEPEND"] = ""
 			edepend["BDEPEND"] = ""
-			edepend["HDEPEND"] = ""
 			ignore_build_time_deps = True
 
 		ignore_depend_deps = ignore_build_time_deps
 		ignore_bdepend_deps = ignore_build_time_deps
-		ignore_hdepend_deps = ignore_build_time_deps
 
 		if removal_action:
 			depend_root = myroot
 		else:
-			if eapi_attrs.bdepend or eapi_attrs.hdepend:
+			if eapi_attrs.bdepend:
 				depend_root = myroot
 			else:
 				depend_root = self._frozen_config._running_root.root
@@ -3319,8 +3317,6 @@ class depgraph(object):
 				edepend["DEPEND"] = ""
 			if ignore_bdepend_deps:
 				edepend["BDEPEND"] = ""
-			if ignore_hdepend_deps:
-				edepend["HDEPEND"] = ""
 
 		# Since build-time deps tend to be a superset of run-time deps, order
 		# dep processing such that build-time deps are popped from
@@ -3335,10 +3331,6 @@ class depgraph(object):
 				self._priority(buildtime=True,
 				optional=(pkg.built or ignore_depend_deps),
 				ignored=ignore_depend_deps)),
-			(self._frozen_config._running_root.root, edepend["HDEPEND"],
-				self._priority(buildtime=True,
-				optional=(pkg.built or ignore_hdepend_deps),
-				ignored=ignore_hdepend_deps)),
 			(self._frozen_config._running_root.root, edepend["BDEPEND"],
 				self._priority(buildtime=True,
 				optional=(pkg.built or ignore_bdepend_deps),

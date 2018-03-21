@@ -30,10 +30,6 @@ ___eapi_has_prefix_variables() {
 	[[ ! ${1-${EAPI-0}} =~ ^(0|1|2)$ || " ${FEATURES} " == *" force-prefix "* ]]
 }
 
-___eapi_has_HDEPEND() {
-	false
-}
-
 ___eapi_has_BDEPEND() {
 	[[ ! ${1-${EAPI-0}} =~ ^(0|1|2|3|4|4-python|5|5-progress|6)$ ]]
 }
