@@ -108,10 +108,6 @@ ___eapi_has_version_functions() {
 	[[ ! ${1-${EAPI-0}} =~ ^(0|1|2|3|4|5|6)$ ]]
 }
 
-___eapi_has_package_manager_build_group() {
-	false
-}
-
 # HELPERS BEHAVIOR
 
 ___eapi_best_version_and_has_version_support_--host-root() {

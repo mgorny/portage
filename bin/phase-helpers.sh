@@ -1171,9 +1171,3 @@ if ___eapi_has_in_iuse; then
 		has "${use}" "${liuse[@]#[+-]}"
 	}
 fi
-
-if ___eapi_has_package_manager_build_group; then
-	package_manager_build_group() {
-		echo "${PORTAGE_BUILD_GROUP}"
-	}
-fi

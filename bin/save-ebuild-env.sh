@@ -81,7 +81,6 @@ __save_ebuild_env() {
 		${QA_INTERCEPTORS}
 
 	___eapi_has_usex && unset -f usex
-	___eapi_has_package_manager_build_group && unset -f package_manager_build_group
 
 	# Clear out the triple underscore namespace as it is reserved by the PM.
 	unset -f $(compgen -A function ___)
