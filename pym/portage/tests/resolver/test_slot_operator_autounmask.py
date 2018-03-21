@@ -73,7 +73,7 @@ class SlotOperatorAutoUnmaskTestCase(TestCase):
 
 			ResolverPlaygroundTestCase(
 				["dev-libs/icu"],
-				options = {"--oneshot": True, "--usepkg": True},
+				options = {"--autounmask": True, "--oneshot": True, "--usepkg": True},
 				success = False,
 				mergelist = ["[binary]dev-libs/icu-49", "dev-libs/libxml2-2.7.8" ],
 				unstable_keywords = ['dev-libs/libxml2-2.7.8']),

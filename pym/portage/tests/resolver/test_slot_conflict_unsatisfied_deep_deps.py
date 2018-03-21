@@ -38,7 +38,7 @@ class SlotConflictUnsatisfiedDeepDepsTestCase(TestCase):
 				["dev-libs/B", "dev-libs/C", "dev-libs/D"],
 				all_permutations=True,
 				options={
-					"--autounmask": "y",
+					"--autounmask": True,
 					"--complete-graph": True
 				},
 				mergelist=["dev-libs/A-2", "dev-libs/B-1", "dev-libs/C-1", "dev-libs/D-1"],
@@ -50,7 +50,7 @@ class SlotConflictUnsatisfiedDeepDepsTestCase(TestCase):
 			ResolverPlaygroundTestCase(
 				["@world"],
 				options={
-					"--autounmask": "y",
+					"--autounmask": True,
 					"--complete-graph": True
 				},
 				mergelist=["dev-libs/A-2", "dev-libs/B-1", "dev-libs/C-1", "dev-libs/D-1"],
@@ -63,7 +63,7 @@ class SlotConflictUnsatisfiedDeepDepsTestCase(TestCase):
 			ResolverPlaygroundTestCase(
 				["@world"],
 				options={
-					"--autounmask": "y",
+					"--autounmask": True,
 					"--complete-graph": True,
 					"--selective": True,
 					"--deep": 0
@@ -78,7 +78,7 @@ class SlotConflictUnsatisfiedDeepDepsTestCase(TestCase):
 			ResolverPlaygroundTestCase(
 				["@world"],
 				options={
-					"--autounmask": "y",
+					"--autounmask": True,
 					"--autounmask-backtrack": "y",
 					"--complete-graph": True,
 					"--selective": True,
@@ -145,7 +145,7 @@ class SlotConflictUnsatisfiedDeepDepsTestCase(TestCase):
 			ResolverPlaygroundTestCase(
 				["@world"],
 				options={
-					"--autounmask": "y",
+					"--autounmask": True,
 					"--autounmask-backtrack": "y",
 					"--complete-graph": True,
 					"--selective": True,

@@ -2871,7 +2871,7 @@ def run_action(emerge_config):
 	apply_priorities(emerge_config.target_config.settings)
 
 	if ("--autounmask-continue" in emerge_config.opts and
-		emerge_config.opts.get("--autounmask") == "n"):
+			not emerge_config.opts.get("--autounmask")):
 		writemsg_level(
 			" %s --autounmask-continue has been disabled by --autounmask=n\n" %
 			warn("*"), level=logging.WARNING, noiselevel=-1)

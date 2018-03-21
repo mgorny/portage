@@ -1,4 +1,4 @@
-# Copyright 2017 Gentoo Foundation
+# Copyright 2017-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 from portage.tests import TestCase
@@ -36,6 +36,7 @@ class AutounmaskKeepKeywordsTestCase(TestCase):
 				['app-misc/A'],
 				success = False,
 				options = {
+					"--autounmask": True,
 					'--autounmask-keep-keywords': 'n',
 				},
 				mergelist = [
@@ -51,6 +52,7 @@ class AutounmaskKeepKeywordsTestCase(TestCase):
 				['app-misc/A'],
 				success = False,
 				options = {
+					"--autounmask": True,
 					'--autounmask-keep-keywords': 'y',
 				},
 				mergelist = [

@@ -1,4 +1,4 @@
-# Copyright 2014 Gentoo Foundation
+# Copyright 2014-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 from portage.tests import TestCase
@@ -46,7 +46,10 @@ class AutounmaskUseBreakageTestCase(TestCase):
 			# due to autounmask USE breakage.
 			ResolverPlaygroundTestCase(
 				["app-misc/C", "app-misc/B", "app-misc/A"],
-				options={"--autounmask-backtrack": "y"},
+				options={
+					"--autounmask": True,
+					"--autounmask-backtrack": "y"
+				},
 				all_permutations = True,
 				success = False,
 				ambiguous_slot_collision_solutions = True,

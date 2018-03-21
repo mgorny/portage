@@ -1,4 +1,4 @@
-# Copyright 2017 Gentoo Foundation
+# Copyright 2017-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 from portage.tests import TestCase
@@ -61,6 +61,7 @@ class AutounmaskUseBacktrackTestCase(TestCase):
 			ResolverPlaygroundTestCase(
 				['dev-libs/D'],
 				options={
+					"--autounmask": True,
 					'--autounmask-backtrack': 'y',
 					'--backtrack': 2,
 				},

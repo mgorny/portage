@@ -1,4 +1,4 @@
-# Copyright 2013-2015 Gentoo Foundation
+# Copyright 2013-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 from portage.tests import TestCase
@@ -243,7 +243,7 @@ class OrChoicesTestCase(TestCase):
 			# profile, so we want to avoid that choice.
 			ResolverPlaygroundTestCase(
 				["sys-libs/A"],
-				options = {},
+				options = { "--autounmask": True },
 				success = False,
 				use_changes = {
 					'sys-libs/zlib-1.2.8-r1': {'abi_x86_32': True}

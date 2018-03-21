@@ -483,7 +483,7 @@ class _dynamic_depgraph_config(object):
 		self._backtrack_infos = {}
 
 		self._buildpkgonly_deps_unsatisfied = False
-		self._autounmask = depgraph._frozen_config.myopts.get('--autounmask') != 'n'
+		self._autounmask = depgraph._frozen_config.myopts.get('--autounmask')
 		self._displayed_autounmask = False
 		self._success_without_autounmask = False
 		self._autounmask_backtrack_disabled = False

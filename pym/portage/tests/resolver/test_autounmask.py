@@ -1,4 +1,4 @@
-# Copyright 2010-2012 Gentoo Foundation
+# Copyright 2010-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 from portage.tests import TestCase
@@ -415,7 +415,7 @@ class AutounmaskTestCase(TestCase):
 				ResolverPlaygroundTestCase(
 					["dev-libs/B", "dev-libs/C", "dev-libs/D"],
 					all_permutations=True,
-					options={"--autounmask": "y"},
+					options={"--autounmask": True},
 					mergelist=["dev-libs/A-2", "dev-libs/B-1", "dev-libs/C-1", "dev-libs/D-1"],
 					ignore_mergelist_order=True,
 					unstable_keywords=["dev-libs/A-2"],
@@ -424,7 +424,7 @@ class AutounmaskTestCase(TestCase):
 				ResolverPlaygroundTestCase(
 					["@test-set"],
 					all_permutations=True,
-					options={"--autounmask": "y"},
+					options={"--autounmask": True},
 					mergelist=["dev-libs/A-2", "dev-libs/B-1", "dev-libs/C-1", "dev-libs/D-1"],
 					ignore_mergelist_order=True,
 					unstable_keywords=["dev-libs/A-2"],
@@ -433,7 +433,7 @@ class AutounmaskTestCase(TestCase):
 				ResolverPlaygroundTestCase(
 					["@world"],
 					all_permutations=True,
-					options={"--autounmask": "y"},
+					options={"--autounmask": True},
 					mergelist=["dev-libs/A-2", "dev-libs/B-1", "dev-libs/C-1", "dev-libs/D-1"],
 					ignore_mergelist_order=True,
 					unstable_keywords=["dev-libs/A-2"],
@@ -513,12 +513,14 @@ class AutounmaskTestCase(TestCase):
 		test_cases = (
 			ResolverPlaygroundTestCase(
 				["dev-libs/B"],
+				options={"--autounmask": True},
 				success=False,
 				mergelist=["dev-libs/A-2", "dev-libs/B-1"],
 				needed_p_mask_changes=set(["dev-libs/A-2"])),
 
 			ResolverPlaygroundTestCase(
 				["dev-libs/C"],
+				options={"--autounmask": True},
 				success=False,
 				mergelist=["dev-libs/A-9999", "dev-libs/C-1"],
 				unstable_keywords=set(["dev-libs/A-9999"]),
