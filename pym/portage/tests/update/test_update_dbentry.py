@@ -1,4 +1,4 @@
-# Copyright 2012-2013 Gentoo Foundation
+# Copyright 2012-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 import re
@@ -137,21 +137,12 @@ class UpdateDbentryTestCase(TestCase):
 				"SLOT": "2",
 			},
 
-			"dev-libs/B-1::test_repo" : {
-				"RDEPEND" : "dev-libs/M dev-libs/N dev-libs/P",
-				"EAPI": "4-python",
-			},
-
 			"dev-libs/M-1::test_repo" : {
 				"EAPI": "4",
 			},
 
 			"dev-libs/N-1::test_repo" : {
 				"EAPI": "4",
-			},
-
-			"dev-libs/N-2::test_repo" : {
-				"EAPI": "4-python",
 			},
 
 		}
@@ -169,18 +160,12 @@ class UpdateDbentryTestCase(TestCase):
 				"SLOT": "2",
 			},
 
-			"dev-libs/B-1::test_repo" : {
-				"RDEPEND" : "dev-libs/M dev-libs/N dev-libs/P",
-				"EAPI": "4-python",
-			},
-
 		}
 
 		world = ["dev-libs/M", "dev-libs/N"]
 
 		updates = textwrap.dedent("""
 			move dev-libs/M dev-libs/M-moved
-			move dev-libs/N dev-libs/N.moved
 		""")
 
 		playground = ResolverPlayground(binpkgs=binpkgs,
@@ -229,35 +214,6 @@ class UpdateDbentryTestCase(TestCase):
 			rdepend = bindb.aux_get("dev-libs/A-1", ["RDEPEND"])[0]
 			self.assertTrue(old_pattern.search(rdepend) is None)
 			self.assertTrue("dev-libs/M-moved" in rdepend)
-			rdepend = vardb.aux_get("dev-libs/B-1", ["RDEPEND"])[0]
-			self.assertTrue(old_pattern.search(rdepend) is None)
-			self.assertTrue("dev-libs/M-moved" in rdepend)
-			rdepend = vardb.aux_get("dev-libs/B-1", ["RDEPEND"])[0]
-			self.assertTrue(old_pattern.search(rdepend) is None)
-			self.assertTrue("dev-libs/M-moved" in rdepend)
-
-			# EAPI 4-python/*-progress N -> N.moved
-			rdepend = vardb.aux_get("dev-libs/B-1", ["RDEPEND"])[0]
-			old_pattern = re.compile(r"\bdev-libs/N(\s|$)")
-			self.assertTrue(old_pattern.search(rdepend) is None)
-			self.assertTrue("dev-libs/N.moved" in rdepend)
-			rdepend = bindb.aux_get("dev-libs/B-1", ["RDEPEND"])[0]
-			self.assertTrue(old_pattern.search(rdepend) is None)
-			self.assertTrue("dev-libs/N.moved" in rdepend)
-			self.assertRaises(KeyError,
-				vardb.aux_get, "dev-libs/N-2", ["EAPI"])
-			vardb.aux_get("dev-libs/N.moved-2", ["RDEPEND"])[0]
-
-			# EAPI 4 does not allow dots in package names for N -> N.moved
-			rdepend = vardb.aux_get("dev-libs/A-1", ["RDEPEND"])[0]
-			self.assertTrue("dev-libs/N" in rdepend)
-			self.assertTrue("dev-libs/N.moved" not in rdepend)
-			rdepend = bindb.aux_get("dev-libs/A-1", ["RDEPEND"])[0]
-			self.assertTrue("dev-libs/N" in rdepend)
-			self.assertTrue("dev-libs/N.moved" not in rdepend)
-			vardb.aux_get("dev-libs/N-1", ["RDEPEND"])[0]
-			self.assertRaises(KeyError,
-				vardb.aux_get, "dev-libs/N.moved-1", ["EAPI"])
 
 			# dont_apply_updates
 			rdepend = vardb.aux_get("dev-libs/A-2", ["RDEPEND"])[0]
@@ -270,8 +226,6 @@ class UpdateDbentryTestCase(TestCase):
 			selected_set.load()
 			self.assertTrue("dev-libs/M" not in selected_set)
 			self.assertTrue("dev-libs/M-moved" in selected_set)
-			self.assertTrue("dev-libs/N" not in selected_set)
-			self.assertTrue("dev-libs/N.moved" in selected_set)
 
 		finally:
 			playground.cleanup()
