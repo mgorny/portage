@@ -226,8 +226,7 @@ class dbapi(object):
 					iuse_implicit_match, frozenset(metadata["USE"].split()))
 		else:
 			iuse_implicit_match = self.settings._iuse_implicit_match
-		usealiases = self.settings._use_manager.getUseAliases(pkg)
-		iuse = Package._iuse(None, metadata["IUSE"].split(), iuse_implicit_match, usealiases, metadata["EAPI"])
+		iuse = Package._iuse(None, metadata["IUSE"].split(), iuse_implicit_match, metadata["EAPI"])
 
 		for x in atom.unevaluated_atom.use.required:
 			if iuse.get_real_flag(x) is None:

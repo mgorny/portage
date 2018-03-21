@@ -1,4 +1,4 @@
-# Copyright 2010-2015 Gentoo Foundation
+# Copyright 2010-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 from itertools import permutations
@@ -40,9 +40,9 @@ class ResolverPlayground(object):
 	config_files = frozenset(("eapi", "layout.conf", "make.conf", "package.accept_keywords",
 		"package.keywords", "package.license", "package.mask", "package.properties",
 		"package.provided", "packages",
-		"package.unmask", "package.use", "package.use.aliases", "package.use.stable.mask",
+		"package.unmask", "package.use", "package.use.stable.mask",
 		"soname.provided",
-		"unpack_dependencies", "use.aliases", "use.force", "use.mask", "layout.conf"))
+		"unpack_dependencies", "use.force", "use.mask", "layout.conf"))
 
 	metadata_xml_template = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
