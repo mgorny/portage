@@ -201,8 +201,6 @@ class x_install(install):
 
 		('bindir=', None, "Install directory for main executables"),
 		('datarootdir=', None, "Data install root directory"),
-		('docdir=', None, "Documentation install directory"),
-		('htmldir=', None, "HTML documentation install directory"),
 		('mandir=', None, "Manpage root install directory"),
 		('portage-base=', 'b', "Portage install base"),
 		('portage-bindir=', None, "Install directory for Portage internal-use executables"),
@@ -219,8 +217,6 @@ class x_install(install):
 		('sysconfdir', '/etc'),
 
 		('datarootdir', '$system_prefix/share'),
-		('docdir', '$datarootdir/doc/$package-$version'),
-		('htmldir', '$docdir/html'),
 		('mandir', '$datarootdir/man'),
 
 		('portage_base', '$system_exec_prefix/lib/portage'),
