@@ -55,7 +55,28 @@ _repo_name = r'[\w][\w-]*'
 _repo_name_re = re.compile('^' + _repo_name + '$', re.UNICODE)
 _repo = r'(?:' + _repo_separator + '(' + _repo_name + ')' + ')?'
 
+atom_re = re.compile('^(?P<without_use>(?:' +
+	'(?P<op>' + _op + _cpv + ')|' +
+	'(?P<star>=' + _cpv + r'\*)|' +
+	'(?P<simple>' + _cp + '))' +
+	'(' + _slot_separator + _slot_loose + ')?' +
+	_repo + ')(' + _use + ')?$', re.VERBOSE | re.UNICODE)
+
 _extended_cat = r'[\w+*][\w+.*-]*'
+
+_wildcard_pkg_re = r'[\w+*][\w+*-]*?'
+wildcard_atom_re = re.compile(r'((?P<simple>(' +
+	_extended_cat + r')/(' + _wildcard_pkg_re + r'(-' + _vr + ')?))' +
+	'|(?P<star>=((' + _extended_cat + r')/(' + _wildcard_pkg_re + r'))-(?P<version>\*\w+\*)))' +
+	'(:(?P<slot>' + _slot_loose + r'))?(' +
+	_repo_separator + r'(?P<repo>' + _repo_name + r'))?$', re.UNICODE)
+
+_flag_re = r'[A-Za-z0-9][A-Za-z0-9+_@-]*'
+usedep_re = re.compile(r'^(?P<prefix>[!-]?)(?P<flag>' +
+	_flag_re + r')(?P<default>(\(\+\)|\(\-\))?)(?P<suffix>[?=]?)$')
+
+flag_re = r'[A-Za-z0-9][A-Za-z0-9+_@-]*'
+useflag_re = re.compile(r'^' + flag_re + r'$')
 
 _slot_dep_re_cache = {}
 
@@ -82,53 +103,6 @@ def _match_slot(atom, pkg):
 		elif atom.sub_slot == pkg.sub_slot:
 			return True
 	return False
-
-_atom_re_cache = {}
-
-def _get_atom_re(eapi_attrs):
-	cache_key = eapi_attrs.dots_in_PN
-	atom_re = _atom_re_cache.get(cache_key)
-	if atom_re is not None:
-		return atom_re
-
-	if eapi_attrs.dots_in_PN:
-		cp_re =  _cp['dots_allowed_in_PN']
-		cpv_re = _cpv['dots_allowed_in_PN']
-	else:
-		cp_re =  _cp['dots_disallowed_in_PN']
-		cpv_re = _cpv['dots_disallowed_in_PN']
-
-	atom_re = re.compile('^(?P<without_use>(?:' +
-		'(?P<op>' + _op + cpv_re + ')|' +
-		'(?P<star>=' + cpv_re + r'\*)|' +
-		'(?P<simple>' + cp_re + '))' + 
-		'(' + _slot_separator + _slot_loose + ')?' +
-		_repo + ')(' + _use + ')?$', re.VERBOSE | re.UNICODE)
-
-	_atom_re_cache[cache_key] = atom_re
-	return atom_re
-
-_atom_wildcard_re_cache = {}
-
-def _get_atom_wildcard_re(eapi_attrs):
-	cache_key = eapi_attrs.dots_in_PN
-	atom_re = _atom_wildcard_re_cache.get(cache_key)
-	if atom_re is not None:
-		return atom_re
-
-	if eapi_attrs.dots_in_PN:
-		pkg_re = r'[\w+*][\w+.*-]*?'
-	else:
-		pkg_re = r'[\w+*][\w+*-]*?'
-
-	atom_re = re.compile(r'((?P<simple>(' +
-		_extended_cat + r')/(' + pkg_re + r'(-' + _vr + ')?))' + \
-		'|(?P<star>=((' + _extended_cat + r')/(' + pkg_re + r'))-(?P<version>\*\w+\*)))' + \
-		'(:(?P<slot>' + _slot_loose + r'))?(' +
-		_repo_separator + r'(?P<repo>' + _repo_name + r'))?$', re.UNICODE)
-
-	_atom_wildcard_re_cache[cache_key] = atom_re
-	return atom_re
 
 _usedep_re_cache = {}
 
@@ -1214,7 +1188,6 @@ class Atom(_unicode):
 		_unicode.__init__(s)
 
 		eapi_attrs = _get_eapi_attrs(eapi)
-		atom_re = _get_atom_re(eapi_attrs)
 
 		self.__dict__['eapi'] = eapi
 		if eapi is not None:
@@ -1247,21 +1220,20 @@ class Atom(_unicode):
 		extended_version = None
 		if m is None:
 			if allow_wildcard:
-				atom_re = _get_atom_wildcard_re(eapi_attrs)
-				m = atom_re.match(s)
+				m = wildcard_atom_re.match(s)
 				if m is None:
 					raise InvalidAtom(self)
 				gdict = m.groupdict()
 				if m.group('star') is not None:
 					op = '=*'
-					base = atom_re.groupindex['star']
+					base = wildcard_atom_re.groupindex['star']
 					cp = m.group(base + 1)
 					cpv = m.group('star')[1:]
 					extended_version = m.group(base + 4)
 				else:
 					op = None
 					cpv = cp = m.group('simple')
-					if m.group(atom_re.groupindex['simple'] + 3) is not None:
+					if m.group(wildcard_atom_re.groupindex['simple'] + 3) is not None:
 						raise InvalidAtom(self)
 				if cpv.find("**") != -1:
 					raise InvalidAtom(self)
