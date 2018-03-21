@@ -37,8 +37,6 @@ x_scripts = {
 	'bin': [
 		'bin/ebuild', 'bin/egencache', 'bin/emerge', 'bin/emerge-webrsync',
 		'bin/emirrordist', 'bin/portageq', 'bin/quickpkg', 'bin/repoman',
-	],
-	'sbin': [
 		'bin/archive-conf', 'bin/dispatch-conf', 'bin/emaint', 'bin/env-update',
 		'bin/etc-update', 'bin/fixpackages', 'bin/regenworld'
 	],
@@ -140,10 +138,6 @@ class x_build_scripts_bin(x_build_scripts_custom):
 	dir_name = 'bin'
 
 
-class x_build_scripts_sbin(x_build_scripts_custom):
-	dir_name = 'sbin'
-
-
 class x_build_scripts_portagebin(x_build_scripts_custom):
 	dir_name = 'portage'
 
@@ -158,7 +152,6 @@ class x_build_scripts(build_scripts):
 	def run(self):
 		self.run_command('build_scripts_bin')
 		self.run_command('build_scripts_portagebin')
-		self.run_command('build_scripts_sbin')
 
 
 class x_clean(clean):
@@ -214,7 +207,6 @@ class x_install(install):
 		('portage-base=', 'b', "Portage install base"),
 		('portage-bindir=', None, "Install directory for Portage internal-use executables"),
 		('portage-datadir=', None, 'Install directory for data files'),
-		('sbindir=', None, "Install directory for superuser-intended executables"),
 		('sysconfdir=', None, 'System configuration path'),
 	]
 
@@ -224,7 +216,6 @@ class x_install(install):
 		('system_exec_prefix', '$system_prefix'),
 
 		('bindir', '$system_exec_prefix/bin'),
-		('sbindir', '$system_exec_prefix/sbin'),
 		('sysconfdir', '/etc'),
 
 		('datarootdir', '$system_prefix/share'),
@@ -373,11 +364,6 @@ class x_install_scripts_bin(x_install_scripts_custom):
 	var_name = 'bindir'
 
 
-class x_install_scripts_sbin(x_install_scripts_custom):
-	dir_name = 'sbin'
-	var_name = 'sbindir'
-
-
 class x_install_scripts_portagebin(x_install_scripts_custom):
 	dir_name = 'portage'
 	var_name = 'portage_bindir'
@@ -393,7 +379,6 @@ class x_install_scripts(install_scripts):
 	def run(self):
 		self.run_command('install_scripts_bin')
 		self.run_command('install_scripts_portagebin')
-		self.run_command('install_scripts_sbin')
 
 
 class x_sdist(sdist):
@@ -562,7 +547,6 @@ setup(
 		'build_scripts': x_build_scripts,
 		'build_scripts_bin': x_build_scripts_bin,
 		'build_scripts_portagebin': x_build_scripts_portagebin,
-		'build_scripts_sbin': x_build_scripts_sbin,
 		'build_tests': build_tests,
 		'clean': x_clean,
 		'install': x_install,
@@ -571,7 +555,6 @@ setup(
 		'install_scripts': x_install_scripts,
 		'install_scripts_bin': x_install_scripts_bin,
 		'install_scripts_portagebin': x_install_scripts_portagebin,
-		'install_scripts_sbin': x_install_scripts_sbin,
 		'sdist': x_sdist,
 		'test': test,
 	},

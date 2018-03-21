@@ -188,7 +188,7 @@ pkg_preinst() {
 
 		portage_python = portage._python_interpreter
 		dispatch_conf_cmd = (portage_python, "-b", "-Wd",
-			os.path.join(self.sbindir, "dispatch-conf"))
+			os.path.join(self.bindir, "dispatch-conf"))
 		ebuild_cmd = (portage_python, "-b", "-Wd",
 			os.path.join(self.bindir, "ebuild"))
 		egencache_cmd = (portage_python, "-b", "-Wd",
@@ -198,19 +198,19 @@ pkg_preinst() {
 		emerge_cmd = (portage_python, "-b", "-Wd",
 			os.path.join(self.bindir, "emerge"))
 		emaint_cmd = (portage_python, "-b", "-Wd",
-			os.path.join(self.sbindir, "emaint"))
+			os.path.join(self.bindir, "emaint"))
 		env_update_cmd = (portage_python, "-b", "-Wd",
-			os.path.join(self.sbindir, "env-update"))
+			os.path.join(self.bindir, "env-update"))
 		etc_update_cmd = (BASH_BINARY,
-			os.path.join(self.sbindir, "etc-update"))
+			os.path.join(self.bindir, "etc-update"))
 		fixpackages_cmd = (portage_python, "-b", "-Wd",
-			os.path.join(self.sbindir, "fixpackages"))
+			os.path.join(self.bindir, "fixpackages"))
 		portageq_cmd = (portage_python, "-b", "-Wd",
 			os.path.join(self.bindir, "portageq"))
 		quickpkg_cmd = (portage_python, "-b", "-Wd",
 			os.path.join(self.bindir, "quickpkg"))
 		regenworld_cmd = (portage_python, "-b", "-Wd",
-			os.path.join(self.sbindir, "regenworld"))
+			os.path.join(self.bindir, "regenworld"))
 
 		rm_binary = find_binary("rm")
 		self.assertEqual(rm_binary is None, False,

@@ -71,15 +71,10 @@ class SyncLocalTestCase(TestCase):
 
 		cmds = {}
 		for cmd in ("emerge", "emaint"):
-			for bindir in (self.bindir, self.sbindir):
-				path = os.path.join(bindir, cmd)
-				if os.path.exists(path):
-					cmds[cmd] =  (portage._python_interpreter,
-						"-b", "-Wd", path)
-					break
-			else:
-				raise AssertionError('%s binary not found in %s or %s' %
-					(cmd, self.bindir, self.sbindir))
+			path = os.path.join(bindir, cmd)
+			assert os.path.exists(path)
+			cmds[cmd] =  (portage._python_interpreter,
+				"-b", "-Wd", path)
 
 		git_binary = find_binary("git")
 		git_cmd = (git_binary,)

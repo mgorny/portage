@@ -35,13 +35,11 @@ if repoman._not_installed:
 	cnf_path = os.path.join(REPOMAN_BASE_PATH, 'cnf')
 	cnf_etc_path = cnf_path
 	cnf_bindir = os.path.join(REPOMAN_BASE_PATH, 'bin')
-	cnf_sbindir = cnf_bindir
 else:
 	cnf_path = os.path.join(EPREFIX or '/', GLOBAL_CONFIG_PATH)
 	cnf_etc_path = os.path.join(EPREFIX or '/', 'etc')
 	cnf_eprefix = EPREFIX
 	cnf_bindir = os.path.join(EPREFIX or '/', 'usr', 'bin')
-	cnf_sbindir = os.path.join(EPREFIX or '/', 'usr', 'sbin')
 
 
 def main():
@@ -198,7 +196,6 @@ class TestCase(unittest.TestCase):
 		self.cnf_path = cnf_path
 		self.cnf_etc_path = cnf_etc_path
 		self.bindir = cnf_bindir
-		self.sbindir = cnf_sbindir
 
 	def defaultTestResult(self):
 		return TextTestResult()
