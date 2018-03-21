@@ -42,7 +42,7 @@ class ResolverPlayground(object):
 		"package.provided", "packages",
 		"package.unmask", "package.use", "package.use.stable.mask",
 		"soname.provided",
-		"unpack_dependencies", "use.force", "use.mask", "layout.conf"))
+		"use.force", "use.mask", "layout.conf"))
 
 	metadata_xml_template = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">

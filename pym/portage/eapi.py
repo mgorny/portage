@@ -80,9 +80,6 @@ def eapi_supports_stable_use_forcing_and_masking(eapi):
 def eapi_allows_directories_on_profile_level_and_repository_level(eapi):
 	return eapi not in ("0", "1", "2", "3", "4", "5", "6")
 
-def eapi_has_automatic_unpack_dependencies(eapi):
-	return False
-
 def eapi_has_bdepend(eapi):
 	return eapi not in ("0", "1", "2", "3", "4", "5", "6")
 
