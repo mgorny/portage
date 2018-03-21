@@ -1172,37 +1172,6 @@ if ___eapi_has_in_iuse; then
 	}
 fi
 
-if ___eapi_has_master_repositories; then
-	master_repositories() {
-		local output repository=$1 retval
-		shift
-		[[ $# -gt 0 ]] && die "${FUNCNAME[0]}: unused argument(s): $*"
-
-		if [[ -n ${PORTAGE_IPC_DAEMON} ]]; then
-			"${PORTAGE_BIN_PATH}/ebuild-ipc" master_repositories "${EROOT}" "${repository}"
-		else
-			output=$("${PORTAGE_BIN_PATH}/ebuild-helpers/portageq" master_repositories "${EROOT}" "${repository}")
-		fi
-		retval=$?
-		[[ -n ${output} ]] && echo "${output}"
-		case "${retval}" in
-			0|1)
-				return ${retval}
-				;;
-			2)
-				die "${FUNCNAME[0]}: invalid repository: ${repository}"
-				;;
-			*)
-				if [[ -n ${PORTAGE_IPC_DAEMON} ]]; then
-					die "${FUNCNAME[0]}: unexpected ebuild-ipc exit code: ${retval}"
-				else
-					die "${FUNCNAME[0]}: unexpected portageq exit code: ${retval}"
-				fi
-				;;
-		esac
-	}
-fi
-
 if ___eapi_has_repository_path; then
 	repository_path() {
 		local output repository=$1 retval
