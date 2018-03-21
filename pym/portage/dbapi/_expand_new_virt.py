@@ -49,7 +49,6 @@ def expand_new_virt(vardb, atom):
 
 		eapi_attrs = _get_eapi_attrs(eapi)
 		# Validate IUSE and IUSE, for early detection of vardb corruption.
-		useflag_re = useflag_re
 		valid_iuse = []
 		for x in iuse.split():
 			if x[:1] in ("+", "-"):
