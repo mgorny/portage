@@ -1,66 +1,49 @@
-About Portage
-=============
+============================
+Portage fork by Michał Górny
+============================
 
-Portage is a package management system based on ports collections. The
-Package Manager Specification Project (PMS) standardises and documents
-the behaviour of Portage so that the Portage tree can be used by other
-package managers.
+This is a fork of the Portage package manager created and maintained
+by Michał Górny.  This fork aims to maintain a reasonable degree
+of backwards compatibility with upstream Portage while focusing
+on four goals:
 
+1. Security first.
 
-Dependencies
-============
+2. Focusing on improvement rather than infinite backwards compatibility.
 
-Python and Bash should be the only hard dependencies. Python 2.7 is the
-minimum supported version.
+3. Cleaning up the code from long-time obsolete features.
 
-Native Extensions
-=================
-
-Portage includes some optional native extensions which can be built
-in the source tree by running the following command:
-
-    python setup.py build_ext --inplace --portage-ext-modules
-
-The following setup.cfg settings can be used to enable building of
-native extensions for all invocations of the build_ext command (the
-build_ext command is invoked automatically by other build commands):
-
-   [build_ext]
-   portage-ext-modules=true
-
-Currently, the native extensions only include libc bindings which are
-used to validate LC_CTYPE and LC_COLLATE behavior for EAPI 6. If the
-native extensions have not been built, then portage will use ctypes
-instead.
-
-Licensing and Legalese
-=======================
-
-Portage is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-version 2 as published by the Free Software Foundation.
-
-Portage is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Portage; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-02110-1301, USA.
+4. Keeping it simple rather than aiming to cover all the corner cases.
 
 
-More information
-================
+Why fork?  Because of the strong reactionism combined with conformism
+in Portage development.  It comes as no surprise to anyone that the code
+of Portage is horrible.  However, any attempts to improve it are doomed
+to fail.  The upstream developers are mostly focusing on adding more
+and more hacks to keep things running, making meaningless changes
+and giving empty promises.
 
--DEVELOPING contains some code guidelines.
--LICENSE contains the GNU General Public License version 2.
--TEST-NOTES contains Portage unit test information.
+Deprecations from years ago are still supported.  New features are
+frequently blocked either by tons of bad code (discouraging people
+from contributing) or by XKCD#1172-class requests to maintain
+compatibility.  Portage developers are ready to disable *major security
+improvements* only if it saves them from getting an occasional bug
+report.
 
 
-Links
-=====
-Gentoo project page: <https://wiki.gentoo.org/wiki/Project:Portage>
-PMS: <https://dev.gentoo.org/~ulm/pms/head/pms.html>
-PMS git repo: <https://gitweb.gentoo.org/proj/pms.git/>
+Why not start from scratch?  I wish I were able to do that.  However,
+creating a new package manager for something as complex as ebuilds is
+a full-time job, and is going to take at least a few months before
+anything reasonably working could emerge from it.  Plus, the reactionism
+inside Gentoo will block it from becoming mainstream as long as it does
+not maintain bug-by-bug compatibility with Portage.  In other words,
+it's a vain effort.  See: paludis, pkgcore.
+
+
+What's the long-term plan?  It's unlikely for this fork to replace
+Portage.  However, its goal is to follow the example set by projects
+such as libav and libressl.  They never became mainstream but they made
+the respective original projects 'wake up' and start solving at least
+some of the problems that were ignored before.  Hopefully this project
+will also make Portage developers reconsider their attitude and start
+working on improving Portage rather than just keeping it alive.
