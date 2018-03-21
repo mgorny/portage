@@ -208,7 +208,6 @@ class AbstractEbuildProcess(SpawnProcess):
 		query_command = QueryCommand(self.settings, self.phase)
 		commands = {
 			'best_version'        : query_command,
-			'eclass_path'         : query_command,
 			'exit'                : self._exit_command,
 			'has_version'         : query_command,
 			'license_path'        : query_command,

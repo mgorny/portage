@@ -108,10 +108,6 @@ ___eapi_has_version_functions() {
 	[[ ! ${1-${EAPI-0}} =~ ^(0|1|2|3|4|5|6)$ ]]
 }
 
-___eapi_has_eclass_path() {
-	false
-}
-
 ___eapi_has_license_path() {
 	false
 }
