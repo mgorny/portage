@@ -48,15 +48,13 @@ def eapi_exports_EBUILD_PHASE_FUNC(eapi):
 	return eapi not in ("0", "1", "2", "3", "4")
 
 def eapi_exports_PORTDIR(eapi):
-	return eapi in ("0", "1", "2", "3", "4",
-			"5", "5-progress", "6")
+	return eapi in ("0", "1", "2", "3", "4", "5", "6")
 
 def eapi_exports_ECLASSDIR(eapi):
-	return eapi in ("0", "1", "2", "3", "4",
-			"5", "5-progress", "6")
+	return eapi in ("0", "1", "2", "3", "4", "5", "6")
 
 def eapi_exports_REPOSITORY(eapi):
-	return eapi in ("5-progress")
+	return False
 
 def eapi_has_pkg_pretend(eapi):
 	return eapi not in ("0", "1", "2", "3")
@@ -77,17 +75,16 @@ def eapi_has_use_dep_defaults(eapi):
 	return eapi not in ("0", "1", "2", "3")
 
 def eapi_requires_posixish_locale(eapi):
-	return eapi not in ("0", "1", "2", "3", "4",
-			"5", "5-progress")
+	return eapi not in ("0", "1", "2", "3", "4", "5")
 
 def eapi_has_repo_deps(eapi):
-	return eapi in ("5-progress")
+	return False
 
 def eapi_allows_dots_in_PN(eapi):
-	return eapi in ("5-progress")
+	return False
 
 def eapi_allows_dots_in_use_flags(eapi):
-	return eapi in ("5-progress")
+	return False
 
 def eapi_supports_stable_use_forcing_and_masking(eapi):
 	return eapi not in ("0", "1", "2", "3", "4")
@@ -96,22 +93,19 @@ def eapi_allows_directories_on_profile_level_and_repository_level(eapi):
 	return eapi not in ("0", "1", "2", "3", "4", "5", "6")
 
 def eapi_has_use_aliases(eapi):
-	return eapi in ("5-progress")
+	return False
 
 def eapi_has_automatic_unpack_dependencies(eapi):
-	return eapi in ("5-progress",)
+	return False
 
 def eapi_has_bdepend(eapi):
-	return eapi not in ("0", "1", "2", "3", "4",
-			"5", "5-progress", "6")
+	return eapi not in ("0", "1", "2", "3", "4", "5", "6")
 
 def eapi_empty_groups_always_true(eapi):
-	return eapi in ("0", "1", "2", "3", "4",
-			"5", "5-progress", "6")
+	return eapi in ("0", "1", "2", "3", "4", "5", "6")
 
 def eapi_path_variables_end_with_trailing_slash(eapi):
-	return eapi in ("0", "1", "2", "3", "4",
-			"5", "5-progress", "6")
+	return eapi in ("0", "1", "2", "3", "4", "5", "6")
 
 _eapi_attrs = collections.namedtuple('_eapi_attrs',
 	'bdepend dots_in_PN dots_in_use_flags exports_EBUILD_PHASE_FUNC '

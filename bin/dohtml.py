@@ -135,8 +135,6 @@ class OptionsClass:
 				self.DOCDESTTREE = normalize_path(self.DOCDESTTREE)
 
 		self.allowed_exts = ['css', 'gif', 'htm', 'html', 'jpeg', 'jpg', 'js', 'png']
-		if os.environ.get("EAPI", "0") in ("5-progress",):
-			self.allowed_exts += ['ico', 'svg', 'xhtml', 'xml']
 		self.allowed_files = []
 		self.disallowed_dirs = ['CVS']
 		self.recurse = False

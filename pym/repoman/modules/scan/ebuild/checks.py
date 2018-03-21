@@ -341,8 +341,7 @@ class EbuildPatches(LineCheck):
 	error = errors.PATCHES_ERROR
 
 	def check_eapi(self, eapi):
-		return eapi in ("0", "1", "2", "3", "4",
-			"5", "5-progress")
+		return eapi in ("0", "1", "2", "3", "4", "5")
 
 
 class EbuildQuotedA(LineCheck):
@@ -545,8 +544,7 @@ class InheritEclass(LineCheck):
 			yield 'no function called from %s.eclass; please drop' % self._eclass
 
 _usex_supported_eapis = ("0", "1", "2", "3", "4")
-_in_iuse_supported_eapis = ("0", "1", "2", "3", "4",
-		"5", "5-progress")
+_in_iuse_supported_eapis = ("0", "1", "2", "3", "4", "5")
 _get_libdir_supported_eapis = _in_iuse_supported_eapis
 _eclass_eapi_functions = {
 	"usex": lambda eapi: eapi not in _usex_supported_eapis,

@@ -462,7 +462,7 @@ def abssymlink(symlink, target=None):
 
 _doebuild_manifest_exempt_depend = 0
 
-_testing_eapis = frozenset(["5-progress", "7_pre1"])
+_testing_eapis = frozenset(["7_pre1"])
 _deprecated_eapis = frozenset([])
 _supported_eapis = frozenset([str(x) for x in range(portage.const.EAPI + 1)] + list(_testing_eapis) + list(_deprecated_eapis))
 
