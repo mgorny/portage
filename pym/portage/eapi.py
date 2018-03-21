@@ -53,9 +53,6 @@ def eapi_exports_PORTDIR(eapi):
 def eapi_exports_ECLASSDIR(eapi):
 	return eapi in ("0", "1", "2", "3", "4", "5", "6")
 
-def eapi_exports_REPOSITORY(eapi):
-	return False
-
 def eapi_has_pkg_pretend(eapi):
 	return eapi not in ("0", "1", "2", "3")
 

@@ -58,7 +58,7 @@ from portage.dbapi.porttree import _parse_uri_map
 from portage.dep import Atom, check_required_use, \
 	human_readable_required_use, paren_enclose, use_reduce
 from portage.eapi import (eapi_exports_KV, eapi_exports_merge_type,
-	eapi_exports_replace_vars, eapi_exports_REPOSITORY,
+	eapi_exports_replace_vars,
 	eapi_has_required_use, eapi_has_src_prepare_and_src_configure,
 	eapi_has_pkg_pretend, _get_eapi_attrs)
 from portage.elog import elog_process, _preload_elog_modules
@@ -442,9 +442,6 @@ def doebuild_environment(myebuild, mydo, myroot=None, settings=None,
 	# when uninstalling a package that has corrupt EAPI metadata.
 	if not eapi_is_supported(eapi):
 		raise UnsupportedAPIException(mycpv, eapi)
-
-	if eapi_exports_REPOSITORY(eapi) and "PORTAGE_REPO_NAME" in mysettings.configdict["pkg"]:
-		mysettings.configdict["pkg"]["REPOSITORY"] = mysettings.configdict["pkg"]["PORTAGE_REPO_NAME"]
 
 	if mydo != "depend":
 		if hasattr(mydbapi, "getFetchMap") and \
