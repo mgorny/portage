@@ -213,7 +213,6 @@ class AbstractEbuildProcess(SpawnProcess):
 			'exit'                : self._exit_command,
 			'has_version'         : query_command,
 			'license_path'        : query_command,
-			'repository_path'     : query_command,
 		}
 		input_fifo, output_fifo = self._init_ipc_fifos()
 		self._ipc_daemon = EbuildIpcDaemon(commands=commands,
