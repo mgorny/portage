@@ -81,7 +81,6 @@ __save_ebuild_env() {
 		${QA_INTERCEPTORS}
 
 	___eapi_has_usex && unset -f usex
-	___eapi_has_license_path && unset -f license_path
 	___eapi_has_package_manager_build_user && unset -f package_manager_build_user
 	___eapi_has_package_manager_build_group && unset -f package_manager_build_group
 

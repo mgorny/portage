@@ -70,7 +70,6 @@ else
 	# These functions die because calls to them during the "depend" phase
 	# are considered to be severe QA violations.
 	funcs+=" best_version has_version portageq"
-	___eapi_has_license_path && funcs+=" license_path"
 	for x in ${funcs} ; do
 		eval "${x}() { die \"\${FUNCNAME}() calls are not allowed in global scope\"; }"
 	done

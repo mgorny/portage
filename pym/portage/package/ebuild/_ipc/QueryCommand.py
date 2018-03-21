@@ -87,21 +87,6 @@ class QueryCommand(IpcCommand):
 		elif cmd == 'best_version':
 			m = best(vardb.match(atom))
 			return ('%s\n' % m, warnings_str, 0)
-		elif cmd in ('license_path',):
-			repo = _repo_name_re.match(args[0])
-			if repo is None:
-				return ('', '%s: Invalid repository: %s\n' % (cmd, args[0]), 2)
-			try:
-				repo = portdb.repositories[args[0]]
-			except KeyError:
-				return ('', warnings_str, 1)
-
-			if cmd == 'license_path':
-				paths = reversed([os.path.join(x.location, 'licenses', args[1]) for x in list(repo.masters) + [repo]])
-				for path in paths:
-					if os.path.exists(path):
-						return ('%s\n' % path, warnings_str, 0)
-				return ('', warnings_str, 1)
 		else:
 			return ('', 'Invalid command: %s\n' % cmd, 3)
 
