@@ -9,7 +9,7 @@ def eapi_has_iuse_defaults(eapi):
 	return eapi != "0"
 
 def eapi_has_iuse_effective(eapi):
-	return eapi not in ("0", "1", "2", "3", "4", "4-python", "4-slot-abi")
+	return eapi not in ("0", "1", "2", "3", "4", "4-python")
 
 def eapi_has_slot_deps(eapi):
 	return eapi != "0"
@@ -45,14 +45,14 @@ def eapi_exports_replace_vars(eapi):
 	return eapi not in ("0", "1", "2", "3")
 
 def eapi_exports_EBUILD_PHASE_FUNC(eapi):
-	return eapi not in ("0", "1", "2", "3", "4", "4-python", "4-slot-abi")
+	return eapi not in ("0", "1", "2", "3", "4", "4-python")
 
 def eapi_exports_PORTDIR(eapi):
-	return eapi in ("0", "1", "2", "3", "4", "4-python", "4-slot-abi",
+	return eapi in ("0", "1", "2", "3", "4", "4-python",
 			"5", "5-progress", "6")
 
 def eapi_exports_ECLASSDIR(eapi):
-	return eapi in ("0", "1", "2", "3", "4", "4-python", "4-slot-abi",
+	return eapi in ("0", "1", "2", "3", "4", "4-python",
 			"5", "5-progress", "6")
 
 def eapi_exports_REPOSITORY(eapi):
@@ -71,13 +71,13 @@ def eapi_has_required_use(eapi):
 	return eapi not in ("0", "1", "2", "3")
 
 def eapi_has_required_use_at_most_one_of(eapi):
-	return eapi not in ("0", "1", "2", "3", "4", "4-python", "4-slot-abi")
+	return eapi not in ("0", "1", "2", "3", "4", "4-python")
 
 def eapi_has_use_dep_defaults(eapi):
 	return eapi not in ("0", "1", "2", "3")
 
 def eapi_requires_posixish_locale(eapi):
-	return eapi not in ("0", "1", "2", "3", "4", "4-python", "4-slot-abi",
+	return eapi not in ("0", "1", "2", "3", "4", "4-python",
 			"5", "5-progress", "5-hdepend")
 
 def eapi_has_repo_deps(eapi):
@@ -90,10 +90,10 @@ def eapi_allows_dots_in_use_flags(eapi):
 	return eapi in ("4-python", "5-progress")
 
 def eapi_supports_stable_use_forcing_and_masking(eapi):
-	return eapi not in ("0", "1", "2", "3", "4", "4-python", "4-slot-abi")
+	return eapi not in ("0", "1", "2", "3", "4", "4-python")
 
 def eapi_allows_directories_on_profile_level_and_repository_level(eapi):
-	return eapi not in ("0", "1", "2", "3", "4", "4-slot-abi", "5", "6")
+	return eapi not in ("0", "1", "2", "3", "4", "5", "6")
 
 def eapi_has_use_aliases(eapi):
 	return eapi in ("4-python", "5-progress")
@@ -105,18 +105,18 @@ def eapi_has_hdepend(eapi):
 	return eapi in ("5-hdepend",)
 
 def eapi_has_bdepend(eapi):
-	return eapi not in ("0", "1", "2", "3", "4", "4-python", "4-slot-abi",
+	return eapi not in ("0", "1", "2", "3", "4", "4-python",
 			"5", "5-progress", "6")
 
 def eapi_has_targetroot(eapi):
 	return eapi in ("5-hdepend",)
 
 def eapi_empty_groups_always_true(eapi):
-	return eapi in ("0", "1", "2", "3", "4", "4-python", "4-slot-abi",
+	return eapi in ("0", "1", "2", "3", "4", "4-python",
 			"5", "5-progress", "6")
 
 def eapi_path_variables_end_with_trailing_slash(eapi):
-	return eapi in ("0", "1", "2", "3", "4", "4-python", "4-slot-abi",
+	return eapi in ("0", "1", "2", "3", "4", "4-python",
 			"5", "5-progress", "6")
 
 _eapi_attrs = collections.namedtuple('_eapi_attrs',

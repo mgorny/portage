@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 # repoman: Checks
-# Copyright 2007-2017 Gentoo Foundation
+# Copyright 2007-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 """This module contains functions used in Repoman to ascertain the quality
@@ -342,7 +342,7 @@ class EbuildPatches(LineCheck):
 
 	def check_eapi(self, eapi):
 		return eapi in ("0", "1", "2", "3", "4", "4-python",
-			"4-slot-abi", "5", "5-hdepend", "5-progress")
+			"5", "5-hdepend", "5-progress")
 
 
 class EbuildQuotedA(LineCheck):
@@ -544,8 +544,8 @@ class InheritEclass(LineCheck):
 			self.repoman_check_name = 'inherit.unused'
 			yield 'no function called from %s.eclass; please drop' % self._eclass
 
-_usex_supported_eapis = ("0", "1", "2", "3", "4", "4-python", "4-slot-abi")
-_in_iuse_supported_eapis = ("0", "1", "2", "3", "4", "4-python", "4-slot-abi",
+_usex_supported_eapis = ("0", "1", "2", "3", "4", "4-python")
+_in_iuse_supported_eapis = ("0", "1", "2", "3", "4", "4-python",
 		"5", "5-hdepend", "5-progress")
 _get_libdir_supported_eapis = _in_iuse_supported_eapis
 _eclass_eapi_functions = {

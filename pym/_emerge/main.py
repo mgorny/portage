@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 from __future__ import print_function
@@ -488,8 +488,7 @@ def parse_opts(tmpcmdline, silent=False):
 			"help": "Ignore the slot/sub-slot := operator parts of dependencies that have "
 				"been recorded when packages where built. This option is intended "
 				"only for debugging purposes, and it only affects built packages "
-				"that specify slot/sub-slot := operator dependencies using the "
-				"experimental \"4-slot-abi\" EAPI.",
+				"that specify slot/sub-slot := operator dependencies.",
 			"choices": y_or_n
 		},
 

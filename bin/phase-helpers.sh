@@ -212,7 +212,7 @@ use() {
 		-n $PORTAGE_INTERNAL_CALLER ]] ; then
 		if [[ ! $u =~ $PORTAGE_IUSE ]] ; then
 			if [[ ${EMERGE_FROM} != binary &&
-				! ${EAPI} =~ ^(0|1|2|3|4|4-python|4-slot-abi)$ ]] ; then
+				! ${EAPI} =~ ^(0|1|2|3|4|4-python)$ ]] ; then
 				# This is only strict starting with EAPI 5, since implicit IUSE
 				# is not well defined for earlier EAPIs (see bug #449708).
 				die "USE Flag '${u}' not in IUSE for ${CATEGORY}/${PF}"

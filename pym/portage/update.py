@@ -1,4 +1,4 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 from __future__ import unicode_literals
@@ -270,7 +270,7 @@ def parse_updates(mycontent):
 					invalid_slot = True
 					break
 				if "/" in slot:
-					# EAPI 4-slot-abi style SLOT is currently not supported.
+					# EAPI 5 style SLOT is currently not supported.
 					invalid_slot = True
 					break
 
