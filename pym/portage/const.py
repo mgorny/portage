@@ -78,7 +78,7 @@ MERGING_IDENTIFIER       = "-MERGING-"
 REPO_NAME_FILE           = "repo_name"
 REPO_NAME_LOC            = "profiles" + "/" + REPO_NAME_FILE
 
-PORTAGE_PACKAGE_ATOM     = "sys-apps/portage"
+PORTAGE_PACKAGE_ATOM     = "sys-apps/portage-mgorny"
 LIBC_PACKAGE_ATOM        = "virtual/libc"
 OS_HEADERS_PACKAGE_ATOM  = "virtual/os-headers"
 CVS_PACKAGE_ATOM         = "dev-vcs/cvs"
