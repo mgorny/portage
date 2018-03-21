@@ -8,7 +8,6 @@ import io
 import portage
 from portage import os
 from portage.dep import Atom, _repo_name_re
-from portage.eapi import eapi_has_repo_deps
 from portage.elog import messages as elog_messages
 from portage.exception import InvalidAtom
 from portage.package.ebuild._ipc.IpcCommand import IpcCommand
@@ -57,14 +56,13 @@ class QueryCommand(IpcCommand):
 		vardb = db[root]["vartree"].dbapi
 
 		if cmd in ('best_version', 'has_version'):
-			allow_repo = eapi_has_repo_deps(eapi)
 			try:
-				atom = Atom(args[0], allow_repo=allow_repo)
+				atom = Atom(args[0], allow_repo=False)
 			except InvalidAtom:
 				return ('', '%s: Invalid atom: %s\n' % (cmd, args[0]), 2)
 
 			try:
-				atom = Atom(args[0], allow_repo=allow_repo, eapi=eapi)
+				atom = Atom(args[0], allow_repo=False, eapi=eapi)
 			except InvalidAtom as e:
 				warnings.append("QA Notice: %s: %s" % (cmd, e))
 

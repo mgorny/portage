@@ -74,9 +74,6 @@ def eapi_has_use_dep_defaults(eapi):
 def eapi_requires_posixish_locale(eapi):
 	return eapi not in ("0", "1", "2", "3", "4", "5")
 
-def eapi_has_repo_deps(eapi):
-	return False
-
 def eapi_allows_dots_in_PN(eapi):
 	return False
 
@@ -110,7 +107,7 @@ _eapi_attrs = collections.namedtuple('_eapi_attrs',
 	'feature_flag_test '
 	'iuse_defaults iuse_effective posixish_locale '
 	'path_variables_end_with_trailing_slash '
-	'repo_deps required_use required_use_at_most_one_of slot_operator slot_deps '
+	'required_use required_use_at_most_one_of slot_operator slot_deps '
 	'src_uri_arrows strong_blocks use_deps use_dep_defaults '
 	'empty_groups_always_true')
 
@@ -146,7 +143,6 @@ def _get_eapi_attrs(eapi):
 		path_variables_end_with_trailing_slash = (eapi is not None and
 			eapi_path_variables_end_with_trailing_slash(eapi)),
 		posixish_locale = (eapi is not None and eapi_requires_posixish_locale(eapi)),
-		repo_deps = (eapi is None or eapi_has_repo_deps(eapi)),
 		required_use = (eapi is None or eapi_has_required_use(eapi)),
 		required_use_at_most_one_of = (eapi is None or eapi_has_required_use_at_most_one_of(eapi)),
 		slot_deps = (eapi is None or eapi_has_slot_deps(eapi)),

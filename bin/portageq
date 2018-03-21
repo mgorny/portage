@@ -43,7 +43,6 @@ del pym_paths
 import portage
 portage._internal_caller = True
 from portage import os
-from portage.eapi import eapi_has_repo_deps
 from portage.util import writemsg, writemsg_stdout
 portage.proxy.lazyimport.lazyimport(globals(),
 	're',
@@ -101,7 +100,7 @@ def has_version(argv):
 
 	warnings = []
 
-	allow_repo = atom_validate_strict is False or eapi_has_repo_deps(eapi)
+	allow_repo = atom_validate_strict is False
 	try:
 		atom = portage.dep.Atom(argv[1], allow_repo=allow_repo)
 	except portage.exception.InvalidAtom:
@@ -149,7 +148,7 @@ def best_version(argv):
 
 	warnings = []
 
-	allow_repo = atom_validate_strict is False or eapi_has_repo_deps(eapi)
+	allow_repo = atom_validate_strict is False
 	try:
 		atom = portage.dep.Atom(argv[1], allow_repo=allow_repo)
 	except portage.exception.InvalidAtom:

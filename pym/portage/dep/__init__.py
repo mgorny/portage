@@ -1219,7 +1219,7 @@ class Atom(_unicode):
 		self.__dict__['eapi'] = eapi
 		if eapi is not None:
 			# Ignore allow_repo when eapi is specified.
-			allow_repo = eapi_attrs.repo_deps
+			allow_repo = False
 		else:
 			# These parameters have "smart" defaults that are only
 			# applied when the caller does not explicitly pass in a
