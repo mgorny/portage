@@ -71,7 +71,7 @@ class SyncLocalTestCase(TestCase):
 
 		cmds = {}
 		for cmd in ("emerge", "emaint"):
-			path = os.path.join(bindir, cmd)
+			path = os.path.join(self.bindir, cmd)
 			assert os.path.exists(path)
 			cmds[cmd] =  (portage._python_interpreter,
 				"-b", "-Wd", path)
