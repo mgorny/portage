@@ -1538,9 +1538,11 @@ class depgraph(object):
 		explored_nodes = set()
 
 		while unexplored:
-			# Handle all unexplored packages.
-			while unexplored:
-				node = unexplored.pop()
+			while True:
+				try:
+					node = unexplored.pop()
+				except KeyError:
+					break
 				for child in conflict_graph.child_nodes(node):
 					# Don't explore a node more than once, in order
 					# to avoid infinite recursion. The forced set
