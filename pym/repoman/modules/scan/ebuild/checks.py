@@ -341,7 +341,7 @@ class EbuildPatches(LineCheck):
 	error = errors.PATCHES_ERROR
 
 	def check_eapi(self, eapi):
-		return eapi in ("0", "1", "2", "3", "4", "4-python",
+		return eapi in ("0", "1", "2", "3", "4",
 			"5", "5-progress")
 
 
@@ -544,8 +544,8 @@ class InheritEclass(LineCheck):
 			self.repoman_check_name = 'inherit.unused'
 			yield 'no function called from %s.eclass; please drop' % self._eclass
 
-_usex_supported_eapis = ("0", "1", "2", "3", "4", "4-python")
-_in_iuse_supported_eapis = ("0", "1", "2", "3", "4", "4-python",
+_usex_supported_eapis = ("0", "1", "2", "3", "4")
+_in_iuse_supported_eapis = ("0", "1", "2", "3", "4",
 		"5", "5-progress")
 _get_libdir_supported_eapis = _in_iuse_supported_eapis
 _eclass_eapi_functions = {
