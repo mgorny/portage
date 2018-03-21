@@ -7,7 +7,7 @@ __all__ = (
 
 from _emerge.Package import Package
 from portage import os
-from portage.dep import Atom, dep_getrepo, dep_getslot, ExtendedAtomDict, remove_slot, _get_useflag_re, _repo_separator
+from portage.dep import Atom, dep_getrepo, dep_getslot, ExtendedAtomDict, remove_slot, useflag_re, _repo_separator
 from portage.eapi import eapi_has_use_aliases, eapi_supports_stable_use_forcing_and_masking
 from portage.exception import InvalidAtom
 from portage.localization import _
@@ -139,7 +139,6 @@ class UseManager(object):
 					(eapi, os.path.basename(file_name), file_name),
 					noiselevel=-1)
 			return ()
-		useflag_re = _get_useflag_re(eapi)
 		for prefixed_useflag in lines:
 			if prefixed_useflag[:1] == "-":
 				useflag = prefixed_useflag[1:]
@@ -204,7 +203,6 @@ class UseManager(object):
 					(eapi, os.path.basename(file_name), file_name),
 					noiselevel=-1)
 			return ret
-		useflag_re = _get_useflag_re(eapi)
 		for k, v in file_dict.items():
 			useflags = []
 			use_expand_prefix = ''
@@ -303,7 +301,6 @@ class UseManager(object):
 			file_name = os.path.join(repo.location, "profiles", "use.aliases")
 			eapi = read_corresponding_eapi_file(
 				file_name, default=repo.eapi)
-			useflag_re = _get_useflag_re(eapi)
 			raw_file_dict = grabdict(file_name, recursive=True)
 			file_dict = {}
 			for real_flag, aliases in raw_file_dict.items():
@@ -329,7 +326,6 @@ class UseManager(object):
 			file_name = os.path.join(repo.location, "profiles", "package.use.aliases")
 			eapi = read_corresponding_eapi_file(
 				file_name, default=repo.eapi)
-			useflag_re = _get_useflag_re(eapi)
 			lines = grabfile(file_name, recursive=True)
 			file_dict = {}
 			for line in lines:

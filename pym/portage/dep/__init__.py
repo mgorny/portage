@@ -78,6 +78,13 @@ usedep_re = re.compile(r'^(?P<prefix>[!-]?)(?P<flag>' +
 flag_re = r'[A-Za-z0-9][A-Za-z0-9+_@-]*'
 useflag_re = re.compile(r'^' + flag_re + r'$')
 
+_flag_re = r'[A-Za-z0-9][A-Za-z0-9+_@-]*'
+usedep_re = re.compile(r'^(?P<prefix>[!-]?)(?P<flag>' +
+	_flag_re + r')(?P<default>(\(\+\)|\(\-\))?)(?P<suffix>[?=]?)$')
+
+flag_re = r'[A-Za-z0-9][A-Za-z0-9+_@-]*'
+useflag_re = re.compile(r'^' + flag_re + r'$')
+
 _slot_dep_re_cache = {}
 
 def _get_slot_dep_re(eapi_attrs):
@@ -103,60 +110,6 @@ def _match_slot(atom, pkg):
 		elif atom.sub_slot == pkg.sub_slot:
 			return True
 	return False
-
-_usedep_re_cache = {}
-
-def _get_usedep_re(eapi_attrs):
-	"""
-	@param eapi_attrs: The EAPI attributes from _get_eapi_attrs
-	@type eapi_attrs: _eapi_attrs
-	@rtype: regular expression object
-	@return: A regular expression object that matches valid USE deps for the
-		given eapi.
-	"""
-	cache_key = eapi_attrs.dots_in_use_flags
-	usedep_re = _usedep_re_cache.get(cache_key)
-	if usedep_re is not None:
-		return usedep_re
-
-	if eapi_attrs.dots_in_use_flags:
-		_flag_re = r'[A-Za-z0-9][A-Za-z0-9+_@.-]*'
-	else:
-		_flag_re = r'[A-Za-z0-9][A-Za-z0-9+_@-]*'
-
-	usedep_re = re.compile(r'^(?P<prefix>[!-]?)(?P<flag>' +
-		_flag_re + r')(?P<default>(\(\+\)|\(\-\))?)(?P<suffix>[?=]?)$')
-
-	_usedep_re_cache[cache_key] = usedep_re
-	return usedep_re
-
-_useflag_re_cache = {}
-
-def _get_useflag_re(eapi):
-	"""
-	When eapi is None then validation is not as strict, since we want the
-	same to work for multiple EAPIs that may have slightly different rules.
-	@param eapi: The EAPI
-	@type eapi: String or None
-	@rtype: regular expression object
-	@return: A regular expression object that matches valid USE flags for the
-		given eapi.
-	"""
-	eapi_attrs = _get_eapi_attrs(eapi)
-	cache_key = eapi_attrs.dots_in_use_flags
-	useflag_re = _useflag_re_cache.get(cache_key)
-	if useflag_re is not None:
-		return useflag_re
-
-	if eapi_attrs.dots_in_use_flags:
-		flag_re = r'[A-Za-z0-9][A-Za-z0-9+_@.-]*'
-	else:
-		flag_re = r'[A-Za-z0-9][A-Za-z0-9+_@-]*'
-
-	useflag_re = re.compile(r'^' + flag_re + r'$')
-
-	_useflag_re_cache[cache_key] = useflag_re
-	return useflag_re
 
 def cpvequal(cpv1, cpv2):
 	"""
@@ -428,7 +381,6 @@ def use_reduce(depstr, uselist=[], masklist=[], matchall=False, excludeall=[], i
 		raise ValueError("portage.dep.use_reduce: 'matchall' and 'matchnone' are mutually exclusive")
 
 	eapi_attrs = _get_eapi_attrs(eapi)
-	useflag_re = _get_useflag_re(eapi)
 
 	def is_active(conditional):
 		"""
@@ -824,7 +776,6 @@ class _use_dep(object):
 		no_default = set()
 
 		conditional = {}
-		usedep_re = _get_usedep_re(self._eapi_attrs)
 
 		for x in use:
 			m = usedep_re.match(x)
@@ -935,7 +886,6 @@ class _use_dep(object):
 		disabled_flags = set(self.disabled)
 
 		tokens = []
-		usedep_re = _get_usedep_re(self._eapi_attrs)
 
 		for x in self.tokens:
 			m = usedep_re.match(x)
@@ -992,8 +942,6 @@ class _use_dep(object):
 		
 		def validate_flag(flag):
 			return is_valid_flag(flag) or flag in all_defaults
-
-		usedep_re = _get_usedep_re(self._eapi_attrs)
 
 		for x in self.tokens:
 			m = usedep_re.match(x)
@@ -1105,7 +1053,6 @@ class _use_dep(object):
 		missing_disabled = self.missing_disabled
 
 		tokens = []
-		usedep_re = _get_usedep_re(self._eapi_attrs)
 
 		for x in self.tokens:
 			m = usedep_re.match(x)
@@ -2695,7 +2642,6 @@ def extract_affecting_use(mystr, atom, eapi=None):
 	@rtype: Set of strings
 	@return: Set of use flags affecting given atom
 	"""
-	useflag_re = _get_useflag_re(eapi)
 	mysplit = mystr.split()
 	level = 0
 	stack = [[]]
