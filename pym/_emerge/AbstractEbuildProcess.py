@@ -207,7 +207,6 @@ class AbstractEbuildProcess(SpawnProcess):
 		self._exit_command.reply_hook = self._exit_command_callback
 		query_command = QueryCommand(self.settings, self.phase)
 		commands = {
-			'available_eclasses'  : query_command,
 			'best_version'        : query_command,
 			'eclass_path'         : query_command,
 			'exit'                : self._exit_command,

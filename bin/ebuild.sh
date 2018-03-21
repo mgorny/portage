@@ -70,7 +70,6 @@ else
 	# These functions die because calls to them during the "depend" phase
 	# are considered to be severe QA violations.
 	funcs+=" best_version has_version portageq"
-	___eapi_has_available_eclasses && funcs+=" available_eclasses"
 	___eapi_has_eclass_path && funcs+=" eclass_path"
 	___eapi_has_license_path && funcs+=" license_path"
 	for x in ${funcs} ; do
