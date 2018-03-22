@@ -192,7 +192,7 @@ def emaint_main(myargv):
 	options, args = parser.parse_known_args(args=myargv)
 
 	if options.version:
-		print(portage.VERSION)
+		print("Portage[mgorny]", portage.VERSION)
 		return os.EX_OK
 
 	if len(args) != 1:

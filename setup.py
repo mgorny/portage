@@ -512,7 +512,7 @@ class build_ext(_build_ext):
 
 
 setup(
-	name = 'portage',
+	name = 'portage-mgorny',
 	version = '2.3.24',
 	url = 'https://github.com/mgorny/portage',
 	author = 'Gentoo Portage Development Team and Michał Górny',

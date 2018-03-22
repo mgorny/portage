@@ -63,7 +63,7 @@ def repoman_main(argv):
 		sys.argv, qahelp, repoman_settings.get("REPOMAN_DEFAULT_OPTS", ""))
 
 	if options.version:
-		print("Repoman", VERSION, "(portage-%s)" % portage.VERSION)
+		print("Repoman from Portage[mgorny]", portage.VERSION)
 		sys.exit(0)
 
 	logger = logging.getLogger()

@@ -1,4 +1,4 @@
-# Copyright 2013-2015 Gentoo Foundation
+# Copyright 2013-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 import argparse
@@ -231,7 +231,7 @@ def emirrordist_main(args):
 	parser, options, args = parse_args(args)
 
 	if options.version:
-		sys.stdout.write("Portage %s\n" % portage.VERSION)
+		sys.stdout.write("Portage[mgorny] %s\n" % portage.VERSION)
 		return os.EX_OK
 
 	config_root = options.config_root

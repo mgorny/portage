@@ -2394,7 +2394,7 @@ def getportageversion(portdir, _unused, profile, chost, vardb):
 	gccver = getgccversion(chost)
 	unameout=platform.release()+" "+platform.machine()
 
-	return "Portage %s (%s, %s, %s, %s, %s)" % \
+	return "Portage[mgorny] %s (%s, %s, %s, %s, %s)" % \
 		(portage.VERSION, pythonver, profilever, gccver, ",".join(libcver), unameout)
 
 

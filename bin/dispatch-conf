@@ -1,5 +1,5 @@
 #!/usr/bin/python -b
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 #
@@ -505,7 +505,7 @@ for x in sys.argv:
     if x in ('-h', '--help'):
         usage(sys.argv)
     elif x in ('--version'):
-        print("Portage", portage.VERSION)
+        print("Portage[mgorny]", portage.VERSION)
         sys.exit(os.EX_OK)
 
 # run

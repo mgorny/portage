@@ -402,8 +402,8 @@ the whole commit message to abort.
 
 		# Use new footer only for git (see bug #438364).
 		if self.vcs_settings.vcs in ["git"]:
-			commit_footer += "Package-Manager: Portage-%s, Repoman-%s" % (
-							portage.VERSION, VERSION)
+			commit_footer += "Package-Manager: Portage[mgorny]-%s" % (
+							portage.VERSION,)
 			if report_options:
 				commit_footer += "\nRepoMan-Options: " + " ".join(report_options)
 			if self.repo_settings.sign_manifests:
@@ -414,7 +414,7 @@ the whole commit message to abort.
 				unameout += platform.processor()
 			else:
 				unameout += platform.machine()
-			commit_footer += "(Portage version: %s/%s/%s" % \
+			commit_footer += "(Portage[mgorny] version: %s/%s/%s" % \
 				(portage.VERSION, self.vcs_settings.vcs, unameout)
 			if report_options:
 				commit_footer += ", RepoMan options: " + " ".join(report_options)
