@@ -456,6 +456,10 @@ class test(Command):
 			sys.executable, '-bWd',
 			os.path.join(self.build_lib, 'portage/tests/runTests.py')
 		])
+		subprocess.check_call([
+			sys.executable, '-bWd',
+			os.path.join(self.build_lib, 'repoman/tests/runTests.py')
+		])
 
 
 def find_packages():
