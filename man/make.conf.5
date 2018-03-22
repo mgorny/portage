@@ -385,7 +385,10 @@ will be reused whenever they are available.
 Enable portage support for the distcc package.
 .TP
 .B distcc\-pump
-Enable portage support for the distcc package with pump mode.
+Ignored.  In the past it used to enable distcc pump mode support
+but it has been removed due to causing numerous issues (including build
+failures, incorrect configure results and even silent miscompilations),
+and being unmaintained upstream.
 .TP
 .B distlocks
 Portage uses lockfiles to ensure competing instances don't clobber
