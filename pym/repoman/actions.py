@@ -362,7 +362,6 @@ the whole commit message to abort.
 	])
 
 	def get_commit_footer(self):
-		portage_version = getattr(portage, "VERSION", None)
 		gpg_key = self.repoman_settings.get("PORTAGE_GPG_KEY", "")
 		dco_sob = self.repoman_settings.get("DCO_SIGNED_OFF_BY", "")
 		report_options = []
@@ -374,11 +373,6 @@ the whole commit message to abort.
 			report_options.append(
 				"--include-arches=\"%s\"" %
 				" ".join(sorted(self.scanner.include_arches)))
-
-		if portage_version is None:
-			sys.stderr.write("Failed to insert portage version in message!\n")
-			sys.stderr.flush()
-			portage_version = "Unknown"
 
 		# Common part of commit footer
 		commit_footer = "\n"
@@ -421,7 +415,7 @@ the whole commit message to abort.
 			else:
 				unameout += platform.machine()
 			commit_footer += "(Portage version: %s/%s/%s" % \
-				(portage_version, self.vcs_settings.vcs, unameout)
+				(portage.VERSION, self.vcs_settings.vcs, unameout)
 			if report_options:
 				commit_footer += ", RepoMan options: " + " ".join(report_options)
 			if self.repo_settings.sign_manifests:
