@@ -36,7 +36,6 @@ from repoman.repos import RepoSettings
 from repoman.scanner import Scanner
 from repoman import utilities
 from repoman.modules.vcs.settings import VCSSettings
-from repoman import VERSION
 
 if sys.hexversion >= 0x3000000:
 	basestring = str

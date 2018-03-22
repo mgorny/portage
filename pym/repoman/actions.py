@@ -34,7 +34,6 @@ from repoman.copyrights import update_copyright
 from repoman.gpg import gpgsign, need_signature
 from repoman import utilities
 from repoman.modules.vcs.vcs import vcs_files_to_cps
-from repoman import VERSION
 
 bad = create_color_func("BAD")
 

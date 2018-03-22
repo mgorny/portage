@@ -326,9 +326,6 @@ class x_install_lib(install_lib):
 		rewrite_file('portage/__init__.py', {
 			'VERSION': self.distribution.get_version(),
 		})
-		rewrite_file('repoman/__init__.py', {
-			'VERSION': self.distribution.get_version(),
-		})
 		rewrite_file('portage/const.py', {
 			'PORTAGE_BASE_PATH': self.portage_base,
 			'PORTAGE_BIN_PATH': self.portage_bindir,
