@@ -353,15 +353,13 @@ intended to be set in the \fBmake.conf\fR(5)
 .BR "\-\-autounmask [ y | n ]"
 Automatically unmask packages and generate package.use
 settings as necessary to satisfy dependencies. This
-option is enabled by default. If any configuration
+option is disabled by default. If any configuration
 changes are required, then they will be displayed
 after the merge list and emerge will immediately
-abort. If the displayed configuration changes are
-satisfactory, you should copy and paste them into
-the specified configuration file(s), or enable the
-\fB\-\-autounmask\-write\fR option. The
-\fBEMERGE_DEFAULT_OPTS\fR variable may be used to
-disable this option by default in \fBmake.conf\fR(5).
+abort. If the \fB\-\-autounmask\-write\fR option
+is enabled, the changes will be written to respective
+configuration files. Otherwise, you need to copy
+and paste them manually.
 .TP
 .BR "\-\-autounmask\-backtrack < y | n >"
 Allow backtracking after autounmask has detected that
