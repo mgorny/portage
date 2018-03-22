@@ -8405,8 +8405,7 @@ class depgraph(object):
 
 		ask = "--ask" in self._frozen_config.myopts
 		autounmask_write = autounmask_continue or \
-				self._frozen_config.myopts.get("--autounmask-write",
-								   ask) is True
+				self._frozen_config.myopts.get("--autounmask-write", True)
 		autounmask_unrestricted_atoms = \
 			self._frozen_config.myopts.get("--autounmask-unrestricted-atoms", "n") == True
 		quiet = "--quiet" in self._frozen_config.myopts
