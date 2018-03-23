@@ -1603,16 +1603,8 @@ class config(object):
 		if has_changed:
 			self.reset(keeping_pkg=1)
 
-		if explicit_iuse is None:
-			explicit_iuse = frozenset(x.lstrip("+-") for x in iuse.split())
-		if eapi_attrs.iuse_effective:
-			iuse_implicit_match = self._iuse_effective_match
-		else:
-			iuse_implicit_match = self._iuse_implicit_match
-
-		if "test" in explicit_iuse or iuse_implicit_match("test"):
-			if "test" in self.features:
-				use_test = "test"
+		if "test" in self.features:
+			use_test = "test"
 
 		if use_test != self.configdict["featurestest"].get("USE", ""):
 			self.configdict["featurestest"]["USE"] = use_test
@@ -1647,8 +1639,11 @@ class config(object):
 		# package has different IUSE.
 		use = set(self["USE"].split())
 		unfiltered_use = frozenset(use)
+		if explicit_iuse is None:
+			explicit_iuse = frozenset(x.lstrip("+-") for x in iuse.split())
 
 		if eapi_attrs.iuse_effective:
+			iuse_implicit_match = self._iuse_effective_match
 			portage_iuse = set(self._iuse_effective)
 			portage_iuse.update(explicit_iuse)
 			if built_use is not None:
@@ -1660,6 +1655,7 @@ class config(object):
 			self.configdict["pkg"]["IUSE_EFFECTIVE"] = \
 				" ".join(sorted(portage_iuse))
 		else:
+			iuse_implicit_match = self._iuse_implicit_match
 			portage_iuse = self._get_implicit_iuse()
 			portage_iuse.update(explicit_iuse)
 
