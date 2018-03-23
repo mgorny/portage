@@ -1472,21 +1472,6 @@ class config(object):
 			self.configdict["pkginternal"]["USE"] = pkginternaluse
 			has_changed = True
 
-		if explicit_iuse is None:
-			explicit_iuse = frozenset(x.lstrip("+-") for x in iuse.split())
-		if eapi_attrs.iuse_effective:
-			iuse_implicit_match = self._iuse_effective_match
-		else:
-			iuse_implicit_match = self._iuse_implicit_match
-
-		if "test" in explicit_iuse or iuse_implicit_match("test"):
-			if "test" in self.features:
-				use_test = "test"
-
-		if use_test != self.configdict["featurestest"].get("USE", ""):
-			self.configdict["featurestest"]["USE"] = use_test
-			has_changed = True
-
 		repo_env = []
 		if repository and repository != Package.UNKNOWN_REPO:
 			repos = []
@@ -1617,6 +1602,23 @@ class config(object):
 
 		if has_changed:
 			self.reset(keeping_pkg=1)
+
+		if explicit_iuse is None:
+			explicit_iuse = frozenset(x.lstrip("+-") for x in iuse.split())
+		if eapi_attrs.iuse_effective:
+			iuse_implicit_match = self._iuse_effective_match
+		else:
+			iuse_implicit_match = self._iuse_implicit_match
+
+		if "test" in explicit_iuse or iuse_implicit_match("test"):
+			if "test" in self.features:
+				use_test = "test"
+
+		if use_test != self.configdict["featurestest"].get("USE", ""):
+			self.configdict["featurestest"]["USE"] = use_test
+			# TODO: can we avoid that?
+			self.reset(keeping_pkg=1)
+			has_changed = True
 
 		env_configdict = self.configdict['env']
 
