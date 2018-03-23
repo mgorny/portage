@@ -32,6 +32,7 @@ portage.proxy.lazyimport.lazyimport(globals(),
 		'grabdict,normalize_path,new_protect_filename',
 	'portage.util.digraph:digraph',
 	'portage.util.env_update:env_update',
+	'portage.util.install_mask:InstallMask',
 	'portage.util.listdir:dircache,listdir',
 	'portage.util.movefile:movefile',
 	'portage.util.path:first_existing,iter_parents',
@@ -1954,7 +1955,7 @@ class dblink(object):
 	@_slot_locked
 	def unmerge(self, pkgfiles=None, trimworld=None, cleanup=True,
 		ldpath_mtimes=None, others_in_slot=None, needed=None,
-		preserve_paths=None, install_mask=[]):
+		preserve_paths=None, install_mask=InstallMask('')):
 		"""
 		Calls prerm
 		Unmerges a given package (CPV)
@@ -1982,7 +1983,7 @@ class dblink(object):
 		@param install_mask: List of INSTALL_MASK values for the install
 			enforcing cleanup. This is needed to let unmerge() clean old
 			files that now are filtered via INSTALL_MASK.
-		@type install_mask: list
+		@type install_mask: InstallMask
 		@rtype: Integer
 		@return:
 		1. os.EX_OK if everything went well.
@@ -2284,7 +2285,7 @@ class dblink(object):
 		@type others_in_slot: list
 		@param new_install_mask: List of values in INSTALL_MASK for replacing
 			package.
-		@type new_install_mask: list
+		@type new_install_mask: InstallMask
 		@rtype: None
 		"""
 
@@ -2305,11 +2306,11 @@ class dblink(object):
 						encoding=_encodings['fs'], errors='strict'),
 					mode='r', encoding=_encodings['repo.content'],
 					errors='replace') as f:
-				old_install_mask = f.read().split()
+				old_install_mask = InstallMask(f.read())
 		except EnvironmentError:
 			# package merged prior to emerge writing INSTALL_MASK
 			# or by another package manager
-			old_install_mask = []
+			old_install_mask = InstallMask('')
 
 		if others_in_slot is None:
 			others_in_slot = []
@@ -2515,13 +2516,13 @@ class dblink(object):
 					# unmerge the file unless:
 					# a. it was INSTALL_MASK-ed previously, so it should
 					#    not have been installed in the first place, or
-					if self._is_install_masked(relative_path[1:], old_install_mask):
+					if old_install_mask.match(relative_path[1:]):
 						show_unmerge("---", unmerge_desc["masked"], file_type, obj)
 						continue
 					# b. it was replaced by a new version (i.e. is owned
 					#    and not covered by new INSTALL_MASK).
-					if is_owned and not self._is_install_masked(
-							relative_path[1:], new_install_mask):
+					if is_owned and not new_install_mask.match(
+							relative_path[1:]):
 						show_unmerge("---", unmerge_desc["replaced"], file_type, obj)
 						continue
 					elif relative_path in cfgfiledict:
@@ -3719,26 +3720,6 @@ class dblink(object):
 	def _emerge_log(self, msg):
 		emergelog(False, msg)
 
-	def _is_install_masked(self, relative_path, install_mask):
-		ret = False
-		for pattern in install_mask:
-			# if pattern starts with -, possibly exclude this path
-			is_inclusive = not pattern.startswith('-')
-			if not is_inclusive:
-				pattern = pattern[1:]
-			# absolute path pattern
-			if pattern.startswith('/'):
-				# match either exact path or one of parent dirs
-				# the latter is done via matching pattern/*
-				if (fnmatch.fnmatch(relative_path, pattern[1:])
-						or fnmatch.fnmatch(relative_path, pattern[1:] + '/*')):
-					ret = is_inclusive
-			# filename
-			else:
-				if fnmatch.fnmatch(os.path.basename(relative_path), pattern):
-					ret = is_inclusive
-		return ret
-
 	def treewalk(self, srcroot, destroot, inforoot, myebuild, cleanup=0,
 		mydbapi=None, prev_mtimes=None, counter=None):
 		"""
@@ -3906,7 +3887,7 @@ class dblink(object):
 					encoding=_encodings['fs'], errors='strict'),
 				mode='r', encoding=_encodings['repo.content'],
 				errors='replace') as f:
-			install_mask = f.read().split()
+			install_mask = InstallMask(f.read())
 
 		# We check for unicode encoding issues after src_install. However,
 		# the check must be repeated here for binary packages (it's
@@ -4711,7 +4692,7 @@ class dblink(object):
 		while mergelist:
 
 			relative_path = mergelist.pop()
-			instmasked = self._is_install_masked(relative_path, install_mask)
+			instmasked = install_mask.match(relative_path)
 			mysrc = join(srcroot, relative_path)
 			mydest = join(destroot, relative_path)
 			# myrealdest is mydest without the $ROOT prefix (makes a difference if ROOT!="/")
