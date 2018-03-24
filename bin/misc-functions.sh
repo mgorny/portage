@@ -43,71 +43,15 @@ install_symlink_html_docs() {
 	fi
 }
 
-# replacement for "readlink -f" or "realpath"
-READLINK_F_WORKS=""
-canonicalize() {
-	if [[ -z ${READLINK_F_WORKS} ]] ; then
-		if [[ $(readlink -f -- /../ 2>/dev/null) == "/" ]] ; then
-			READLINK_F_WORKS=true
-		else
-			READLINK_F_WORKS=false
-		fi
-	fi
-	if ${READLINK_F_WORKS} ; then
-		readlink -f -- "$@"
-		return
-	fi
-
-	local f=$1 b n=10 wd=$(pwd)
-	while (( n-- > 0 )); do
-		while [[ ${f: -1} = / && ${#f} -gt 1 ]]; do
-			f=${f%/}
-		done
-		b=${f##*/}
-		cd "${f%"${b}"}" 2>/dev/null || break
-		if [[ ! -L ${b} ]]; then
-			f=$(pwd -P)
-			echo "${f%/}/${b}"
-			cd "${wd}"
-			return 0
-		fi
-		f=$(readlink "${b}")
-	done
-	cd "${wd}"
-	return 1
-}
-
 prepcompress() {
 	local -a include exclude incl_d incl_f
-	local f g i real_f real_d
+	local f g
 	if ! ___eapi_has_prefix_variables; then
 		local ED=${D}
 	fi
 
-	# Canonicalize path names and check for their existence.
-	real_d=$(canonicalize "${ED}")
-	for (( i = 0; i < ${#PORTAGE_DOCOMPRESS[@]}; i++ )); do
-		real_f=$(canonicalize "${ED%/}/${PORTAGE_DOCOMPRESS[i]#/}")
-		f=${real_f#"${real_d}"}
-		if [[ ${real_f} != "${f}" ]] && [[ -d ${real_f} || -f ${real_f} ]]
-		then
-			include[${#include[@]}]=${f:-/}
-		elif [[ ${i} -ge 3 ]]; then
-			ewarn "prepcompress:" \
-				"ignoring nonexistent path '${PORTAGE_DOCOMPRESS[i]}'"
-		fi
-	done
-	for (( i = 0; i < ${#PORTAGE_DOCOMPRESS_SKIP[@]}; i++ )); do
-		real_f=$(canonicalize "${ED%/}/${PORTAGE_DOCOMPRESS_SKIP[i]#/}")
-		f=${real_f#"${real_d}"}
-		if [[ ${real_f} != "${f}" ]] && [[ -d ${real_f} || -f ${real_f} ]]
-		then
-			exclude[${#exclude[@]}]=${f:-/}
-		elif [[ ${i} -ge 1 ]]; then
-			ewarn "prepcompress:" \
-				"ignoring nonexistent path '${PORTAGE_DOCOMPRESS_SKIP[i]}'"
-		fi
-	done
+	include=( "${PORTAGE_DOCOMPRESS[@]}" )
+	exclude=( "${PORTAGE_DOCOMPRESS_SKIP[@]}" )
 
 	# Remove redundant entries from lists.
 	# For the include list, remove any entries that are:
