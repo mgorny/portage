@@ -54,16 +54,70 @@ while [[ $# -gt 0 ]] ; do
 	shift
 done
 
-# figure out the new suffix
-suffix=$(ecompress --suffix)
+guess_suffix() {
+	if [[ ! -e ${T}/.ecompress.suffix ]] ; then
+		set -e
+		tmpdir="${T}"/.ecompress$$.${RANDOM}
+		mkdir "${tmpdir}"
+		cd "${tmpdir}"
+		# we have to fill the file enough so that there is something
+		# to compress as some programs will refuse to do compression
+		# if it cannot actually compress the file
+		echo {0..1000} > compressme
+		${PORTAGE_COMPRESS} ${PORTAGE_COMPRESS_FLAGS} compressme > /dev/null
+		# If PORTAGE_COMPRESS_FLAGS contains -k then we need to avoid
+		# having our glob match the uncompressed file here.
+		suffix=$(echo compressme.*)
+		[[ -z $suffix || "$suffix" == "compressme.*" ]] && \
+			suffix=$(echo compressme*)
+		suffix=${suffix#compressme}
+		cd /
+		rm -rf "${tmpdir}"
+		echo "${suffix}" > "${T}/.ecompress.suffix"
+	fi
+	cat "${T}/.ecompress.suffix"
+}
 
-# funk_up_dir(action, suffix, binary)
+# figure out the new suffix
+suffix=$(guess_suffix)
+
+compress_file() {
+	mask_ext_re=""
+	set -f
+	for x in $PORTAGE_COMPRESS_EXCLUDE_SUFFIXES ; do
+		mask_ext_re+="|$x"
+	done
+	set +f
+	mask_ext_re="^(${mask_ext_re:1})\$"
+	declare -a filtered_args=()
+	i=0
+	for x in "$@" ; do
+		[[ ${x##*.} =~ $mask_ext_re ]] && continue
+		[[ -s ${x} ]] || continue
+		filtered_args[$i]=$x
+		((i++))
+	done
+	[ $i -eq 0 ] && exit 0
+	set -- "${filtered_args[@]}"
+
+	# If a compressed version of the file already exists, simply
+	# delete it so that the compressor doesn't whine (bzip2 will
+	# complain and skip, gzip will prompt for input)
+	[[ -n ${suffix} ]] && echo -n "${@/%/${suffix}$'\001'}" | \
+		tr '\001' '\000' | ${XARGS} -0 rm -f
+	# Finally, let's actually do some real work
+	"${PORTAGE_COMPRESS}" ${PORTAGE_COMPRESS_FLAGS} "$@"
+	ret=$?
+	[[ $ret -ne 0 ]] && __helpers_die "${0##*/} failed"
+	return ${ret}
+}
+
+# funk_up_dir(action, suffix)
 #	- action: compress
 #	- suffix: the compression suffix to work with
-#	- binary: the program to execute that'll compress
 # The directory we act on is implied in the ${dir} variable
 funk_up_dir() {
-	local act=$1 suffix=$2 binary=$3
+	local act=$1 suffix=$2
 	local size_limit=${PORTAGE_DOCOMPRESS_SIZE_LIMIT}
 
 	[[ ${act} == "compress" ]] || die "${FUNCNAME}: invalid action: ${act}"
@@ -75,8 +129,11 @@ funk_up_dir() {
 		! -iname "*${suffix}"
 	)
 	[[ -n ${size_limit} ]] && args+=( -size "+${size_limit}c" )
-	find "${dir}" "${args[@]}" -print0 | ${XARGS} -0 ${binary}
-	((ret|=$?))
+	local f
+	while IFS= read -d '' -r f; do
+		compress_file "${f}"
+		((ret|=$?))
+	done < <(find "${dir}" "${args[@]}" -print0)
 
 	# Repeat until nothing changes, in order to handle multiple
 	# levels of indirection (see bug #470916).
@@ -145,12 +202,22 @@ ret=0
 
 rm -rf "${T}"/ecompress-skip
 
+# setup compression stuff
+PORTAGE_COMPRESS=${PORTAGE_COMPRESS-bzip2}
+[[ -z ${PORTAGE_COMPRESS} ]] && exit 0
+
+if [[ ${PORTAGE_COMPRESS_FLAGS+set} != "set" ]] ; then
+	case ${PORTAGE_COMPRESS} in
+		bzip2|gzip)  PORTAGE_COMPRESS_FLAGS="-9";;
+	esac
+fi
+
 for dir in "$@" ; do
 	dir=${dir#/}
 	dir="${ED%/}/${dir#/}"
 	rm -f "${dir}.ecompress"
 	if [[ -f ${dir} ]]; then
-		ecompress "${dir}"
+		compress_file "${dir}"
 		continue
 	elif [[ ! -d ${dir} ]] ; then
 		continue
@@ -172,8 +239,8 @@ for dir in "$@" ; do
 
 	# now lets do our work
 	if [[ -n ${suffix} ]] ; then
-		__vecho "${0##*/}: $(ecompress --bin) /${actual_dir#${ED%/}}"
-		funk_up_dir "compress" "${suffix}" "ecompress"
+		__vecho "${0##*/}: ${PORTAGE_COMPRESS} ${PORTAGE_COMPRESS_FLAGS} /${actual_dir#${ED%/}}"
+		funk_up_dir "compress" "${suffix}"
 		: $(( ret |= $? ))
 	fi
 
