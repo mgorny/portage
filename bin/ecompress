@@ -39,7 +39,7 @@ while [[ $# -gt 0 ]] ; do
 		[[ -n $2 ]] && __vecho "${0##*/}: --dequeue takes no additional arguments" 1>&2
 		find "${ED}" -name '*.ecompress' -print0 \
 			| sed -e 's:\.ecompress::g' -e "s:${ED%/}::g" \
-			| ${XARGS} -0 ecompressdir
+			| ${XARGS} -0 "${0}"
 		find "${ED}" -name '*.ecompress.skip' -print0 | ${XARGS} -0 rm -f
 		exit 0
 		;;
@@ -169,7 +169,7 @@ funk_up_dir() {
 	(( indirection++ ))
 	if (( indirection >= 100 )) ; then
 		# Protect against possibility of a bug triggering an endless loop.
-		eerror "ecompressdir: too many levels of indirection for" \
+		eerror "ecompress: too many levels of indirection for" \
 			"'${actual_dir#${ED%/}}/${something_changed#./}'"
 		break
 	fi

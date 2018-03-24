@@ -128,12 +128,12 @@ install_qa_check() {
 	__prepall
 
 	# Queue up for compression.
-	# ecompressdir doesn't like to be called with empty argument lists.
+	# ecompress doesn't like to be called with empty argument lists.
 	[[ ${#PORTAGE_DOCOMPRESS[@]} -gt 0 ]] &&
-		ecompressdir --queue "${PORTAGE_DOCOMPRESS[@]}"
+		"${PORTAGE_BIN_PATH}"/ecompress --queue "${PORTAGE_DOCOMPRESS[@]}"
 	[[ ${#PORTAGE_DOCOMPRESS_SKIP[@]} -gt 0 ]] &&
-		ecompressdir --ignore "${PORTAGE_DOCOMPRESS_SKIP[@]}"
-	ecompressdir --dequeue
+		"${PORTAGE_BIN_PATH}"/ecompress --ignore "${PORTAGE_DOCOMPRESS_SKIP[@]}"
+	"${PORTAGE_BIN_PATH}"/ecompress --dequeue
 
 	# Create NEEDED.ELF.2 regardless of RESTRICT=binchecks, since this info is
 	# too useful not to have (it's required for things like preserve-libs), and
