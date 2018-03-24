@@ -21,6 +21,7 @@ while [[ $# -gt 0 ]] ; do
 		for skip in "$@" ; do
 			[[ -d ${ED%/}/${skip#/} || -f ${ED%/}/${skip#/} ]] \
 				&& >> "${ED%/}/${skip#/}.ecompress.skip"
+			rm -f "${ED%/}/${skip#/}".ecompress.{dir,file}
 		done
 		exit 0
 		;;
