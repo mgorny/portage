@@ -1,4 +1,4 @@
-# Copyright 2010-2013 Gentoo Foundation
+# Copyright 2010-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 __all__ = ['deprecated_profile_check']
@@ -77,7 +77,8 @@ def deprecated_profile_check(settings=None):
 					"can migrate to the above profile.")), noiselevel=-1)
 				writemsg(" %s %s\n\n" % (colorize("WARN", "*"),
 					_("In order to update portage, "
-					"run 'emerge --oneshot portage'.")),
+					"run 'emerge --oneshot %s'." %
+					(portage.const.PORTAGE_PACKAGE_ATOM,))),
 					noiselevel=-1)
 
 	return True

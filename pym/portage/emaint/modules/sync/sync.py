@@ -1,4 +1,4 @@
-# Copyright 2014-2017 Gentoo Foundation
+# Copyright 2014-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 import logging
@@ -299,7 +299,8 @@ class SyncRepos(object):
 			msgs.append(warn(" * ")+bold("An update to portage is available.")+" It is _highly_ recommended")
 			msgs.append(warn(" * ")+"that you update portage now, before any other packages are updated.")
 			msgs.append('')
-			msgs.append(warn(" * ")+"To update portage, run 'emerge --oneshot portage' now.")
+			msgs.append(warn(" * ")+"To update portage, run 'emerge --oneshot %s' now."
+					% (portage.const.PORTAGE_PACKAGE_ATOM,))
 			msgs.append('')
 		return msgs
 
