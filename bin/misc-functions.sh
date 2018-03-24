@@ -245,7 +245,7 @@ install_qa_check() {
 
 	export STRIP_MASK
 	__prepall
-	___eapi_has_docompress && prepcompress
+	prepcompress
 	ecompressdir --dequeue
 	ecompress --dequeue
 
