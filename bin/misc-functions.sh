@@ -53,42 +53,6 @@ prepcompress() {
 	include=( "${PORTAGE_DOCOMPRESS[@]}" )
 	exclude=( "${PORTAGE_DOCOMPRESS_SKIP[@]}" )
 
-	# Remove redundant entries from lists.
-	# For the include list, remove any entries that are:
-	# a) contained in a directory in the include or exclude lists, or
-	# b) identical with an entry in the exclude list.
-	for (( i = ${#include[@]} - 1; i >= 0; i-- )); do
-		f=${include[i]}
-		for g in "${include[@]}"; do
-			if [[ ${f} == "${g%/}"/* ]]; then
-				unset include[i]
-				continue 2
-			fi
-		done
-		for g in "${exclude[@]}"; do
-			if [[ ${f} = "${g}" || ${f} == "${g%/}"/* ]]; then
-				unset include[i]
-				continue 2
-			fi
-		done
-	done
-	# For the exclude list, remove any entries that are:
-	# a) contained in a directory in the exclude list, or
-	# b) _not_ contained in a directory in the include list.
-	for (( i = ${#exclude[@]} - 1; i >= 0; i-- )); do
-		f=${exclude[i]}
-		for g in "${exclude[@]}"; do
-			if [[ ${f} == "${g%/}"/* ]]; then
-				unset exclude[i]
-				continue 2
-			fi
-		done
-		for g in "${include[@]}"; do
-			[[ ${f} == "${g%/}"/* ]] && continue 2
-		done
-		unset exclude[i]
-	done
-
 	# Split the include list into directories and files
 	for f in "${include[@]}"; do
 		if [[ -d ${ED%/}/${f#/} ]]; then
