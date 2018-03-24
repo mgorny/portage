@@ -13,7 +13,6 @@ if ! ___eapi_has_prefix_variables; then
 	ED=${D} EPREFIX=
 fi
 
-SIZE_LIMIT=''
 while [[ $# -gt 0 ]] ; do
 	case $1 in
 	--ignore)
@@ -32,8 +31,7 @@ while [[ $# -gt 0 ]] ; do
 		set -- "${@/#/${ED%/}/}"
 		ret=0
 		for x in "$@" ; do
-			# Stash the limit in the .dir file so we can reload it later.
-			printf "${SIZE_LIMIT}" > "${x}"
+			>> "${x}"
 			((ret|=$?))
 		done
 		[[ $ret -ne 0 ]] && __helpers_die "${0##*/} failed"
@@ -46,10 +44,6 @@ while [[ $# -gt 0 ]] ; do
 			| ${XARGS} -0 ecompressdir
 		find "${ED}" -name '*.ecompress.skip' -print0 | ${XARGS} -0 rm -f
 		exit 0
-		;;
-	--limit)
-		SIZE_LIMIT=$2
-		shift
 		;;
 	--*)
 		__helpers_die "${0##*/}: unknown arguments '$*'"
@@ -65,14 +59,14 @@ done
 # figure out the new suffix
 suffix=$(ecompress --suffix)
 
-# funk_up_dir(action, suffix, binary, [size_limit])
+# funk_up_dir(action, suffix, binary)
 #	- action: compress
 #	- suffix: the compression suffix to work with
 #	- binary: the program to execute that'll compress
-#   - size_limit: if compressing, skip files smaller than this
 # The directory we act on is implied in the ${dir} variable
 funk_up_dir() {
-	local act=$1 suffix=$2 binary=$3 size_limit=$4
+	local act=$1 suffix=$2 binary=$3
+	local size_limit=${PORTAGE_DOCOMPRESS_SIZE_LIMIT}
 
 	[[ ${act} == "compress" ]] || die "${FUNCNAME}: invalid action: ${act}"
 
@@ -169,7 +163,6 @@ for dir in "$@" ; do
 
 	# since we've been requested to compress the whole dir,
 	# delete any individual queued requests
-	size_limit=${SIZE_LIMIT:-$(<"${actual_dir}.ecompress.dir")}
 	rm -f "${actual_dir}.ecompress.dir"
 	find "${dir}" -type f -name '*.ecompress.file' -print0 | ${XARGS} -0 rm -f
 
@@ -180,7 +173,7 @@ for dir in "$@" ; do
 	# now lets do our work
 	if [[ -n ${suffix} ]] ; then
 		__vecho "${0##*/}: $(ecompress --bin) /${actual_dir#${ED%/}}"
-		funk_up_dir "compress" "${suffix}" "ecompress" "${size_limit}"
+		funk_up_dir "compress" "${suffix}" "ecompress"
 		: $(( ret |= $? ))
 	fi
 
