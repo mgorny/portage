@@ -17,38 +17,51 @@ while [[ $# -gt 0 ]] ; do
 	case $1 in
 	--ignore)
 		shift
-		for skip in "$@" ; do
-			[[ -d ${ED%/}/${skip#/} || -f ${ED%/}/${skip#/} ]] \
-				&& >> "${ED%/}/${skip#/}.ecompress.skip"
-			rm -f "${ED%/}/${skip#/}".ecompress
+
+		skip_dirs=()
+		for skip; do
+			if [[ -d ${ED%/}/${skip#/} ]]; then
+				skip_dirs+=( "${ED%/}/${skip#/}" )
+			else
+				rm -f "${ED%/}/${skip#/}.ecompress" || die
+			fi
 		done
+
+		if [[ ${skip_dirs[@]} ]]; then
+			find "${skip_dirs[@]}" -name '*.ecompress' -delete || die
+		fi
+
 		exit 0
 		;;
 	--queue)
 		shift
-		ret=0
-		for x in "${@#/}" ; do
-			[[ -e ${ED%/}/${x} ]] || continue
-			>> "${ED%/}/${x}.ecompress"
-			((ret|=$?))
+
+		find_args=()
+		for path; do
+			if [[ -e ${ED%/}/${path#/} ]]; then
+				find_args+=( "${ED%/}/${path#/}" )
+			fi
 		done
-		[[ $ret -ne 0 ]] && __helpers_die "${0##*/} failed"
-		exit $ret
-		;;
-	--dequeue)
-		[[ -n $2 ]] && __vecho "${0##*/}: --dequeue takes no additional arguments" 1>&2
-		find "${ED}" -name '*.ecompress' -print0 \
-			| sed -e 's:\.ecompress::g' -e "s:${ED%/}::g" \
-			| ${XARGS} -0 "${0}"
-		find "${ED}" -name '*.ecompress.skip' -print0 | ${XARGS} -0 rm -f
+
+		if [[ ${find_args[@]} ]]; then
+			find_args+=( -type f )
+			[[ -n ${PORTAGE_DOCOMPRESS_SIZE_LIMIT} ]] &&
+				find_args+=( -size "+${PORTAGE_DOCOMPRESS_SIZE_LIMIT}c" )
+
+			while IFS= read -d '' -r path; do
+				>> "${path}.ecompress" || die
+			done < <(find "${find_args[@]}" -print0 || die)
+		fi
+
 		exit 0
 		;;
-	--*)
-		__helpers_die "${0##*/}: unknown arguments '$*'"
-		exit 1
+	--dequeue)
+		[[ -n ${2} ]] && die "${0##*/}: --dequeue takes no additional arguments"
+		break
 		;;
 	*)
-		break
+		die "${0##*/}: unknown arguments '$*'"
+		exit 1
 		;;
 	esac
 	shift
@@ -112,29 +125,7 @@ compress_file() {
 	return ${ret}
 }
 
-# funk_up_dir(action, suffix)
-#	- action: compress
-#	- suffix: the compression suffix to work with
-# The directory we act on is implied in the ${dir} variable
-funk_up_dir() {
-	local act=$1 suffix=$2
-	local size_limit=${PORTAGE_DOCOMPRESS_SIZE_LIMIT}
-
-	[[ ${act} == "compress" ]] || die "${FUNCNAME}: invalid action: ${act}"
-
-	local ret=0
-	# first we act on all the files
-	local args=(
-		-type f
-		! -iname "*${suffix}"
-	)
-	[[ -n ${size_limit} ]] && args+=( -size "+${size_limit}c" )
-	local f
-	while IFS= read -d '' -r f; do
-		compress_file "${f}"
-		((ret|=$?))
-	done < <(find "${dir}" "${args[@]}" -print0)
-
+fix_symlinks() {
 	# Repeat until nothing changes, in order to handle multiple
 	# levels of indirection (see bug #470916).
 	local -i indirection=0
@@ -143,17 +134,6 @@ funk_up_dir() {
 	while read -r -d $'\0' brokenlink ; do
 		[[ -e ${brokenlink} ]] && continue
 		olddest=$(readlink "${brokenlink}")
-		# Ignore temporarily broken symlinks due to
-		# _relocate_skip_dirs (bug #399595), and handle
-		# absolute symlinks to files that aren't merged
-		# yet (bug #405327).
-		if [[ ${olddest} == /* ]] ; then
-			[ -e "${D%/}${olddest}" ] && continue
-			skip_dir_dest=${T}/ecompress-skip/${olddest#${EPREFIX}}
-		else
-			skip_dir_dest=${T}/ecompress-skip/${actual_dir#${ED%/}}/${brokenlink%/*}/${olddest}
-		fi
-		[[ -e ${skip_dir_dest} ]] && continue
 		newdest=${olddest}${suffix}
 		if [[ "${newdest}" == /* ]] ; then
 			[[ -f "${D%/}${newdest}" ]] || continue
@@ -161,10 +141,11 @@ funk_up_dir() {
 			[[ -f "${dir}/${brokenlink%/*}/${newdest}" ]] || continue
 		fi
 		something_changed=${brokenlink}
-		rm -f "${brokenlink}"
+		rm -f "${brokenlink}" &&
 		ln -snf "${newdest}" "${brokenlink}${suffix}"
 		((ret|=$?))
-	done < <(find "${dir}" -type l -print0)
+	done < <(find "${ED}" -type l -print0 || die)
+
 	[[ -n ${something_changed} ]] || break
 	(( indirection++ ))
 	if (( indirection >= 100 )) ; then
@@ -174,33 +155,9 @@ funk_up_dir() {
 		break
 	fi
 	done
+
 	return ${ret}
 }
-
-# _relocate_skip_dirs(srctree, dsttree)
-# Move all files and directories we want to skip running compression
-# on from srctree to dsttree.
-_relocate_skip_dirs() {
-	local srctree="$1" dsttree="$2"
-
-	[[ -d ${srctree} ]] || return 0
-
-	find "${srctree}" -name '*.ecompress.skip' -print0 | \
-	while read -r -d $'\0' src ; do
-		src=${src%.ecompress.skip}
-		dst="${dsttree}${src#${srctree}}"
-		parent=${dst%/*}
-		mkdir -p "${parent}"
-		mv "${src}" "${dst}"
-		mv "${src}.ecompress.skip" "${dst}.ecompress.skip"
-	done
-}
-hide_skip_dirs()    { _relocate_skip_dirs "${ED}" "${T}"/ecompress-skip/ ; }
-restore_skip_dirs() { _relocate_skip_dirs "${T}"/ecompress-skip/ "${ED}" ; }
-
-ret=0
-
-rm -rf "${T}"/ecompress-skip
 
 # setup compression stuff
 PORTAGE_COMPRESS=${PORTAGE_COMPRESS-bzip2}
@@ -212,41 +169,17 @@ if [[ ${PORTAGE_COMPRESS_FLAGS+set} != "set" ]] ; then
 	esac
 fi
 
-for dir in "$@" ; do
-	dir=${dir#/}
-	dir="${ED%/}/${dir#/}"
-	rm -f "${dir}.ecompress"
-	if [[ -f ${dir} ]]; then
-		compress_file "${dir}"
-		continue
-	elif [[ ! -d ${dir} ]] ; then
-		continue
-	fi
-	cd "${dir}"
-	actual_dir=${dir}
-	dir=. # use relative path to avoid 'Argument list too long' errors
+ret=0
+while IFS= read -d '' -r path; do
+	file_path=${path%.ecompress}
 
-	# hide all the stuff we want to skip
-	hide_skip_dirs "${dir}"
+	rm -f "${path}"
+	compress_file "${file_path}"
+	: $(( ret |= ${?} ))
+done < <(find "${ED}" -name '*.ecompress' -print0 || die)
 
-	# since we've been requested to compress the whole dir,
-	# delete any individual queued requests
-	find "${dir}" -type f -name '*.ecompress' -print0 | ${XARGS} -0 rm -f
-
-	# forcibly break all hard links as some compressors whine about it
-	find "${dir}" -type f -links +1 -exec env file="{}" sh -c \
-		'cp -p "${file}" "${file}.ecompress.break" ; mv -f "${file}.ecompress.break" "${file}"' \;
-
-	# now lets do our work
-	if [[ -n ${suffix} ]] ; then
-		__vecho "${0##*/}: ${PORTAGE_COMPRESS} ${PORTAGE_COMPRESS_FLAGS} /${actual_dir#${ED%/}}"
-		funk_up_dir "compress" "${suffix}"
-		: $(( ret |= $? ))
-	fi
-
-	# finally, restore the skipped stuff
-	restore_skip_dirs
-done
-
+fix_symlinks
+: $(( ret |= ${?} ))
 [[ $ret -ne 0 ]] && __helpers_die "${0##*/} failed"
+
 exit ${ret}
