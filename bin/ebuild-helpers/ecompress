@@ -53,9 +53,11 @@ case $1 in
 	--queue)
 		shift
 		ret=0
-		for x in "${@/%/.ecompress.file}" ; do
-			>> "$x"
-			((ret|=$?))
+		for x in "${@}" ; do
+			if [[ -f ${x} ]]; then
+				>> "${x}.ecompress.file"
+				((ret|=$?))
+			fi
 		done
 		[[ $ret -ne 0 ]] && __helpers_die "${0##*/} failed"
 		exit $ret
