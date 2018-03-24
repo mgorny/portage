@@ -43,16 +43,6 @@ install_symlink_html_docs() {
 	fi
 }
 
-prepcompress() {
-	# Queue up for compression.
-	# ecompressdir doesn't like to be called with empty argument lists.
-	[[ ${#PORTAGE_DOCOMPRESS[@]} -gt 0 ]] &&
-		ecompressdir --queue "${PORTAGE_DOCOMPRESS[@]}"
-	[[ ${#PORTAGE_DOCOMPRESS_SKIP[@]} -gt 0 ]] &&
-		ecompressdir --ignore "${PORTAGE_DOCOMPRESS_SKIP[@]}"
-	return 0
-}
-
 __prepall() {
 	if has chflags $FEATURES ; then
 		# Save all the file flags for restoration at the end of prepall.
@@ -136,7 +126,13 @@ install_qa_check() {
 
 	export STRIP_MASK
 	__prepall
-	prepcompress
+
+	# Queue up for compression.
+	# ecompressdir doesn't like to be called with empty argument lists.
+	[[ ${#PORTAGE_DOCOMPRESS[@]} -gt 0 ]] &&
+		ecompressdir --queue "${PORTAGE_DOCOMPRESS[@]}"
+	[[ ${#PORTAGE_DOCOMPRESS_SKIP[@]} -gt 0 ]] &&
+		ecompressdir --ignore "${PORTAGE_DOCOMPRESS_SKIP[@]}"
 	ecompressdir --dequeue
 
 	# Create NEEDED.ELF.2 regardless of RESTRICT=binchecks, since this info is
