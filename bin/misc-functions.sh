@@ -44,29 +44,12 @@ install_symlink_html_docs() {
 }
 
 prepcompress() {
-	local -a include exclude incl_d incl_f
-	local f g
-	if ! ___eapi_has_prefix_variables; then
-		local ED=${D}
-	fi
-
-	include=( "${PORTAGE_DOCOMPRESS[@]}" )
-	exclude=( "${PORTAGE_DOCOMPRESS_SKIP[@]}" )
-
-	# Split the include list into directories and files
-	for f in "${include[@]}"; do
-		if [[ -d ${ED%/}/${f#/} ]]; then
-			incl_d[${#incl_d[@]}]=${f}
-		else
-			incl_f[${#incl_f[@]}]=${f}
-		fi
-	done
-
 	# Queue up for compression.
-	# ecompress{,dir} doesn't like to be called with empty argument lists.
-	[[ ${#incl_d[@]} -gt 0 ]] && ecompressdir --queue "${incl_d[@]}"
-	[[ ${#incl_f[@]} -gt 0 ]] && ecompress --queue "${incl_f[@]/#/${ED%/}}"
-	[[ ${#exclude[@]} -gt 0 ]] && ecompressdir --ignore "${exclude[@]}"
+	# ecompressdir doesn't like to be called with empty argument lists.
+	[[ ${#PORTAGE_DOCOMPRESS[@]} -gt 0 ]] &&
+		ecompressdir --queue "${PORTAGE_DOCOMPRESS[@]}"
+	[[ ${#PORTAGE_DOCOMPRESS_SKIP[@]} -gt 0 ]] &&
+		ecompressdir --ignore "${PORTAGE_DOCOMPRESS_SKIP[@]}"
 	return 0
 }
 
@@ -155,7 +138,6 @@ install_qa_check() {
 	__prepall
 	prepcompress
 	ecompressdir --dequeue
-	ecompress --dequeue
 
 	# Create NEEDED.ELF.2 regardless of RESTRICT=binchecks, since this info is
 	# too useful not to have (it's required for things like preserve-libs), and

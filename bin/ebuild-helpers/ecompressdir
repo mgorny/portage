@@ -20,18 +20,16 @@ while [[ $# -gt 0 ]] ; do
 		for skip in "$@" ; do
 			[[ -d ${ED%/}/${skip#/} || -f ${ED%/}/${skip#/} ]] \
 				&& >> "${ED%/}/${skip#/}.ecompress.skip"
-			rm -f "${ED%/}/${skip#/}".ecompress.{dir,file}
+			rm -f "${ED%/}/${skip#/}".ecompress
 		done
 		exit 0
 		;;
 	--queue)
 		shift
-		set -- "${@#/}"
-		set -- "${@/%/.ecompress.dir}"
-		set -- "${@/#/${ED%/}/}"
 		ret=0
-		for x in "$@" ; do
-			>> "${x}"
+		for x in "${@#/}" ; do
+			[[ -e ${ED%/}/${x} ]] || continue
+			>> "${ED%/}/${x}.ecompress"
 			((ret|=$?))
 		done
 		[[ $ret -ne 0 ]] && __helpers_die "${0##*/} failed"
@@ -39,8 +37,8 @@ while [[ $# -gt 0 ]] ; do
 		;;
 	--dequeue)
 		[[ -n $2 ]] && __vecho "${0##*/}: --dequeue takes no additional arguments" 1>&2
-		find "${ED}" -name '*.ecompress.dir' -print0 \
-			| sed -e 's:\.ecompress\.dir::g' -e "s:${ED%/}::g" \
+		find "${ED}" -name '*.ecompress' -print0 \
+			| sed -e 's:\.ecompress::g' -e "s:${ED%/}::g" \
 			| ${XARGS} -0 ecompressdir
 		find "${ED}" -name '*.ecompress.skip' -print0 | ${XARGS} -0 rm -f
 		exit 0
@@ -150,8 +148,11 @@ rm -rf "${T}"/ecompress-skip
 for dir in "$@" ; do
 	dir=${dir#/}
 	dir="${ED%/}/${dir#/}"
-	if [[ ! -d ${dir} ]] ; then
-		__vecho "${0##*/}: /${dir#${ED%/}} does not exist!"
+	rm -f "${dir}.ecompress"
+	if [[ -f ${dir} ]]; then
+		ecompress "${dir}"
+		continue
+	elif [[ ! -d ${dir} ]] ; then
 		continue
 	fi
 	cd "${dir}"
@@ -163,8 +164,7 @@ for dir in "$@" ; do
 
 	# since we've been requested to compress the whole dir,
 	# delete any individual queued requests
-	rm -f "${actual_dir}.ecompress.dir"
-	find "${dir}" -type f -name '*.ecompress.file' -print0 | ${XARGS} -0 rm -f
+	find "${dir}" -type f -name '*.ecompress' -print0 | ${XARGS} -0 rm -f
 
 	# forcibly break all hard links as some compressors whine about it
 	find "${dir}" -type f -links +1 -exec env file="{}" sh -c \
