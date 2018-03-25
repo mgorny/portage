@@ -59,7 +59,8 @@ __prepall() {
 	"${PORTAGE_BIN_PATH}"/ecompress --ignore "${PORTAGE_DOCOMPRESS_SKIP[@]}"
 	"${PORTAGE_BIN_PATH}"/ecompress --dequeue
 
-	"${PORTAGE_BIN_PATH}"/estrip --queue /
+	"${PORTAGE_BIN_PATH}"/estrip --queue "${PORTAGE_DOSTRIP[@]}"
+	"${PORTAGE_BIN_PATH}"/estrip --ignore "${PORTAGE_DOSTRIP_SKIP[@]}"
 	"${PORTAGE_BIN_PATH}"/estrip --dequeue
 
 	if has chflags $FEATURES ; then
