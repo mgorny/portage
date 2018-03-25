@@ -59,7 +59,8 @@ __prepall() {
 	"${PORTAGE_BIN_PATH}"/ecompress --ignore "${PORTAGE_DOCOMPRESS_SKIP[@]}"
 	"${PORTAGE_BIN_PATH}"/ecompress --dequeue
 
-	"${PORTAGE_BIN_PATH}"/estrip "${ED}"
+	"${PORTAGE_BIN_PATH}"/estrip --queue /
+	"${PORTAGE_BIN_PATH}"/estrip --dequeue
 
 	if has chflags $FEATURES ; then
 		# Restore all the file flags that were saved at the beginning of prepall.
