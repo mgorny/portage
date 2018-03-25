@@ -267,20 +267,20 @@ class AutounmaskTestCase(TestCase):
 				#Test mask and keyword changes.
 				ResolverPlaygroundTestCase(
 					["app-text/A"],
-					options={"--autounmask": True},
+					options={"--autounmask": True, "--autounmask-keep-masks": "n"},
 					success=False,
 					mergelist=["app-text/A-1"],
 					needed_p_mask_changes=["app-text/A-1"]),
 				ResolverPlaygroundTestCase(
 					["app-text/B"],
-					options={"--autounmask": True},
+					options={"--autounmask": True, "--autounmask-keep-masks": "n"},
 					success=False,
 					mergelist=["app-text/B-1"],
 					unstable_keywords=["app-text/B-1"],
 					needed_p_mask_changes=["app-text/B-1"]),
 				ResolverPlaygroundTestCase(
 					["app-text/C"],
-					options={"--autounmask": True},
+					options={"--autounmask": True, "--autounmask-keep-masks": "n"},
 					success=False,
 					mergelist=["app-text/C-1"],
 					unstable_keywords=["app-text/C-1"],
@@ -295,7 +295,7 @@ class AutounmaskTestCase(TestCase):
 				#Test missing keyword
 				ResolverPlaygroundTestCase(
 					["=app-text/D-2"],
-					options={"--autounmask": True},
+					options={"--autounmask": True, "--autounmask-keep-masks": "n"},
 					success=False,
 					mergelist=["app-text/D-2"],
 					unstable_keywords=["app-text/D-2"])
@@ -513,14 +513,14 @@ class AutounmaskTestCase(TestCase):
 		test_cases = (
 			ResolverPlaygroundTestCase(
 				["dev-libs/B"],
-				options={"--autounmask": True},
+				options={"--autounmask": True, "--autounmask-keep-masks": "n"},
 				success=False,
 				mergelist=["dev-libs/A-2", "dev-libs/B-1"],
 				needed_p_mask_changes=set(["dev-libs/A-2"])),
 
 			ResolverPlaygroundTestCase(
 				["dev-libs/C"],
-				options={"--autounmask": True},
+				options={"--autounmask": True, "--autounmask-keep-masks": "n"},
 				success=False,
 				mergelist=["dev-libs/A-9999", "dev-libs/C-1"],
 				unstable_keywords=set(["dev-libs/A-9999"]),

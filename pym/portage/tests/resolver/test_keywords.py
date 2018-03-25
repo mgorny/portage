@@ -48,28 +48,29 @@ class KeywordsTestCase(TestCase):
 
 			ResolverPlaygroundTestCase(
 				['app-misc/D'],
-				options = { "--autounmask": True },
+				# TODO: failing with --autounmask-keep-masks looks like a bug
+				options = { "--autounmask": True, "--autounmask-keep-masks": "n"},
 				success = False,
 				unstable_keywords = ('app-misc/D-1',),
 				mergelist = ['app-misc/D-1']),
 
 			ResolverPlaygroundTestCase(
 				['app-misc/E'],
-				options = { "--autounmask": True },
+				options = { "--autounmask": True, "--autounmask-keep-masks": "n" },
 				success = False,
 				unstable_keywords = ('app-misc/E-1',),
 				mergelist = ['app-misc/E-1']),
 
 			ResolverPlaygroundTestCase(
 				['app-misc/F'],
-				options = { "--autounmask": True },
+				options = { "--autounmask": True, "--autounmask-keep-masks": "n" },
 				success = False,
 				unstable_keywords = ('app-misc/F-1',),
 				mergelist = ['app-misc/F-1']),
 
 			ResolverPlaygroundTestCase(
 				['app-misc/G'],
-				options = { "--autounmask": True },
+				options = { "--autounmask": True, "--autounmask-keep-masks": "n" },
 				success = False,
 				unstable_keywords = ('app-misc/G-1',),
 				mergelist = ['app-misc/G-1']),
@@ -113,7 +114,7 @@ class KeywordsTestCase(TestCase):
 
 			ResolverPlaygroundTestCase(
 				['app-misc/B'],
-				options = { "--autounmask": True },
+				options = { "--autounmask": True, "--autounmask-keep-masks": "n" },
 				success = False,
 				unstable_keywords = ('app-misc/B-1',),
 				mergelist = ['app-misc/B-1']),
@@ -125,7 +126,7 @@ class KeywordsTestCase(TestCase):
 
 			ResolverPlaygroundTestCase(
 				['app-misc/D'],
-				options = { "--autounmask": True },
+				options = { "--autounmask": True, "--autounmask-keep-masks": "n" },
 				success = False,
 				unstable_keywords = ('app-misc/D-1',),
 				mergelist = ['app-misc/D-1']),
@@ -137,14 +138,14 @@ class KeywordsTestCase(TestCase):
 
 			ResolverPlaygroundTestCase(
 				['app-misc/F'],
-				options = { "--autounmask": True },
+				options = { "--autounmask": True, "--autounmask-keep-masks": "n" },
 				success = False,
 				unstable_keywords = ('app-misc/F-1',),
 				mergelist = ['app-misc/F-1']),
 
 			ResolverPlaygroundTestCase(
 				['app-misc/G'],
-				options = { "--autounmask": True },
+				options = { "--autounmask": True, "--autounmask-keep-masks": "n" },
 				success = False,
 				unstable_keywords = ('app-misc/G-1',),
 				mergelist = ['app-misc/G-1']),
@@ -203,21 +204,21 @@ class KeywordsTestCase(TestCase):
 
 			ResolverPlaygroundTestCase(
 				['app-misc/E'],
-				options = { "--autounmask": True },
+				options = { "--autounmask": True, "--autounmask-keep-masks": "n" },
 				success = False,
 				unstable_keywords = ('app-misc/E-1',),
 				mergelist = ['app-misc/E-1']),
 
 			ResolverPlaygroundTestCase(
 				['app-misc/F'],
-				options = { "--autounmask": True },
+				options = { "--autounmask": True, "--autounmask-keep-masks": "n" },
 				success = False,
 				unstable_keywords = ('app-misc/F-1',),
 				mergelist = ['app-misc/F-1']),
 
 			ResolverPlaygroundTestCase(
 				['app-misc/G'],
-				options = { "--autounmask": True },
+				options = { "--autounmask": True, "--autounmask-keep-masks": "n" },
 				success = False,
 				unstable_keywords = ('app-misc/G-1',),
 				mergelist = ['app-misc/G-1']),
@@ -286,7 +287,7 @@ class KeywordsTestCase(TestCase):
 
 			ResolverPlaygroundTestCase(
 				['app-misc/G'],
-				options = { "--autounmask": True },
+				options = { "--autounmask": True, "--autounmask-keep-masks": "n" },
 				success = False,
 				unstable_keywords = ('app-misc/G-1',),
 				mergelist = ['app-misc/G-1']),
