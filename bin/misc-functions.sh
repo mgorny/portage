@@ -54,6 +54,11 @@ __prepall() {
 
 	[[ -d ${ED%/}/usr/share/info ]] && prepinfo
 
+	# Apply compression.
+	"${PORTAGE_BIN_PATH}"/ecompress --queue "${PORTAGE_DOCOMPRESS[@]}"
+	"${PORTAGE_BIN_PATH}"/ecompress --ignore "${PORTAGE_DOCOMPRESS_SKIP[@]}"
+	"${PORTAGE_BIN_PATH}"/ecompress --dequeue
+
 	prepallstrip
 
 	if has chflags $FEATURES ; then
@@ -120,11 +125,6 @@ install_qa_check() {
 
 	export STRIP_MASK
 	__prepall
-
-	# Apply compression.
-	"${PORTAGE_BIN_PATH}"/ecompress --queue "${PORTAGE_DOCOMPRESS[@]}"
-	"${PORTAGE_BIN_PATH}"/ecompress --ignore "${PORTAGE_DOCOMPRESS_SKIP[@]}"
-	"${PORTAGE_BIN_PATH}"/ecompress --dequeue
 
 	# Create NEEDED.ELF.2 regardless of RESTRICT=binchecks, since this info is
 	# too useful not to have (it's required for things like preserve-libs), and
