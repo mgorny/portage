@@ -110,7 +110,7 @@ compress_file() {
 		filtered_args[$i]=$x
 		((i++))
 	done
-	[ $i -eq 0 ] && exit 0
+	[ $i -eq 0 ] && return 0
 	set -- "${filtered_args[@]}"
 
 	# If a compressed version of the file already exists, simply
