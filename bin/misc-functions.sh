@@ -52,12 +52,6 @@ __prepall() {
 		chflags -R nosunlnk,nouunlnk "${ED}" 2>/dev/null
 	fi
 
-	if ! ___eapi_has_docompress; then
-		while IFS= read -r -d '' mandir ; do
-			mandir=${mandir#${ED}}
-			prepman "${mandir%/man}"
-		done < <(find "${ED}" -type d -name man -print0)
-	fi
 	[[ -d ${ED%/}/usr/share/info ]] && prepinfo
 
 	prepallstrip
