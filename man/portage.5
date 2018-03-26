@@ -56,7 +56,6 @@ modules
 package.accept_keywords
 package.accept_restrict
 package.env
-package.keywords
 package.license
 package.mask
 package.properties
@@ -686,16 +685,10 @@ not distributing pregenerated metadata cache, run `emerge \-\-regen`
 to keep all metadata in that format alone (useful for querying), enable
 FEATURES="metadata-transfer" in \fBmake.conf\fR(5).
 .TP
-\fBpackage.accept_keywords\fR and \fBpackage.keywords\fR
+\fBpackage.accept_keywords\fR
 Per\-package ACCEPT_KEYWORDS.  Useful for mixing unstable packages in with a
 normally stable system or vice versa.  This will allow ACCEPT_KEYWORDS to be
-augmented for a single package. If both \fBpackage.accept_keywords\fR and
-\fBpackage.keywords\fR are present, both of them will be used, and values
-from \fBpackage.accept_keywords\fR will override values from
-\fBpackage.keywords\fR. The \fBpackage.accept_keywords\fR file is
-intended to replace the \fBpackage.keywords\fR file, since
-profiles support a different form of \fBpackage.keywords\fR which
-modifies effective KEYWORDS (rather than ACCEPT_KEYWORDS).
+augmented for a single package.
 
 .I Format:
 .nf
@@ -714,8 +707,8 @@ net-analyzer/netcat
 
 .I Note:
 .fi
-In addition to the normal values from ACCEPT_KEYWORDS package.keywords supports
-three special tokens:
+In addition to the normal values from ACCEPT_KEYWORDS package.accept_keywords
+supports three special tokens:
 
 .nf
 \fB*\fR  package is visible if it is stable on any architecture

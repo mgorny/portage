@@ -1,4 +1,4 @@
-# Copyright 2010-2014 Gentoo Foundation
+# Copyright 2010-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 __all__ = (
@@ -55,15 +55,9 @@ class KeywordsManager(object):
 
 		if user_config:
 			pkgdict = grabdict_package(
-				os.path.join(abs_user_config, "package.keywords"),
-				recursive=1, allow_wildcard=True, allow_repo=True,
-				verify_eapi=False, allow_build_id=True)
-
-			for k, v in grabdict_package(
 				os.path.join(abs_user_config, "package.accept_keywords"),
 				recursive=1, allow_wildcard=True, allow_repo=True,
-				verify_eapi=False, allow_build_id=True).items():
-				pkgdict.setdefault(k, []).extend(v)
+				verify_eapi=False, allow_build_id=True)
 
 			accept_keywords_defaults = global_accept_keywords.split()
 			accept_keywords_defaults = tuple('~' + keyword for keyword in \

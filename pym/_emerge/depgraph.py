@@ -8630,13 +8630,8 @@ class depgraph(object):
 					settings["PORTAGE_CONFIGROOT"], USER_CONFIG_PATH)
 
 				if root in unstable_keyword_msg:
-					if not os.path.exists(os.path.join(abs_user_config,
-						"package.keywords")):
-						filename = "package.accept_keywords"
-					else:
-						filename = "package.keywords"
-					file_to_write_to[(abs_user_config, "package.keywords")] = \
-						find_config_file(abs_user_config, filename)
+					file_to_write_to[(abs_user_config, "package.accept_keywords")] = \
+						find_config_file(abs_user_config, "package.accept_keywords")
 
 				if root in p_mask_change_msg:
 					file_to_write_to[(abs_user_config, "package.unmask")] = \
@@ -8760,7 +8755,7 @@ class depgraph(object):
 
 				if root in unstable_keyword_msg:
 					write_changes(root, unstable_keyword_msg[root],
-						file_to_write_to.get((abs_user_config, "package.keywords")))
+						file_to_write_to.get((abs_user_config, "package.accept_keywords")))
 
 				if root in p_mask_change_msg:
 					write_changes(root, p_mask_change_msg[root],

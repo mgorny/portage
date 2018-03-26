@@ -306,13 +306,13 @@ def update_config_files(config_root, protect, protect_mask, update_iter,
 	file_contents = {}
 	myxfiles = [
 		"package.accept_keywords", "package.env",
-		"package.keywords", "package.license",
+		"package.license",
 		"package.mask", "package.properties",
 		"package.unmask", "package.use", "sets"
 	]
 	myxfiles += [os.path.join("profile", x) for x in (
 		"packages", "package.accept_keywords",
-		"package.keywords", "package.mask",
+		"package.mask",
 		"package.unmask", "package.use",
 		"package.use.force", "package.use.mask",
 		"package.use.stable.force", "package.use.stable.mask"
