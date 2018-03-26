@@ -2,7 +2,7 @@
 .SH "NAME"
 make.conf \- custom settings for Portage
 .SH "SYNOPSIS"
-\fB/etc/make.conf\fR and \fB/etc/portage/make.conf\fR
+\fB/etc/portage/make.conf\fR
 .SH "DESCRIPTION"
 
 This file contains various variables that are used by Portage. The file has a
@@ -20,9 +20,7 @@ together as if it were a single file.
 .br
 Portage will check the currently\-defined environment variables
 first for any settings.  If no environment settings are found,
-Portage then checks the make.conf files. Both /etc/make.conf and
-/etc/portage/make.conf are checked (if present), and settings from
-/etc/portage/make.conf will override settings from /etc/make.conf.
+Portage then checks the /etc/portage/make.conf file. 
 If no setting is found in the make.conf files, Portage checks
 make.globals. If no
 setting is found there, the profile's default setting is grabbed
@@ -1190,7 +1188,7 @@ Arfrever Frehtes Taifersar Arahesis <arfrever@apache.org>
 .fi
 .SH "FILES"
 .TP
-\fB/etc/make.conf\fR and \fB/etc/portage/make.conf\fR
+\fB/etc/portage/make.conf\fR
 Contains variables for the build\-process and overwrites those in
 make.defaults.
 .TP

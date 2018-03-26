@@ -323,30 +323,11 @@ class config(object):
 			eprefix = locations_manager.eprefix
 			config_root = locations_manager.config_root
 			abs_user_config = locations_manager.abs_user_config
-			make_conf_paths = [
-				os.path.join(config_root, 'etc', 'make.conf'),
-				os.path.join(config_root, MAKE_CONF_FILE)
-			]
-			try:
-				if os.path.samefile(*make_conf_paths):
-					make_conf_paths.pop()
-			except OSError:
-				pass
 
-			make_conf_count = 0
-			make_conf = {}
-			for x in make_conf_paths:
-				mygcfg = getconfig(x,
-					tolerant=tolerant, allow_sourcing=True,
-					expand=make_conf, recursive=True)
-				if mygcfg is not None:
-					make_conf.update(mygcfg)
-					make_conf_count += 1
-
-			if make_conf_count == 2:
-				writemsg("!!! %s\n" %
-					_("Found 2 make.conf files, using both '%s' and '%s'") %
-					tuple(make_conf_paths), noiselevel=-1)
+			make_conf = getconfig(
+				os.path.join(config_root, MAKE_CONF_FILE),
+				tolerant=tolerant, allow_sourcing=True,
+				recursive=True) or {}
 
 			# Allow ROOT setting to come from make.conf if it's not overridden
 			# by the constructor argument (from the calling environment).
@@ -590,11 +571,10 @@ class config(object):
 			self.configlist.append(mygcfg)
 			self.configdict["defaults"]=self.configlist[-1]
 
-			mygcfg = {}
-			for x in make_conf_paths:
-				mygcfg.update(getconfig(x,
-					tolerant=tolerant, allow_sourcing=True,
-					expand=expand_map, recursive=True) or {})
+			mygcfg = getconfig(
+				os.path.join(config_root, MAKE_CONF_FILE),
+				tolerant=tolerant, allow_sourcing=True,
+				expand=expand_map, recursive=True) or {}
 
 			# Don't allow the user to override certain variables in make.conf
 			profile_only_variables = self.configdict["defaults"].get(
