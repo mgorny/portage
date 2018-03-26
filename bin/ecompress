@@ -67,6 +67,16 @@ while [[ $# -gt 0 ]] ; do
 	shift
 done
 
+# setup compression stuff
+PORTAGE_COMPRESS=${PORTAGE_COMPRESS-bzip2}
+[[ -z ${PORTAGE_COMPRESS} ]] && exit 0
+
+if [[ ${PORTAGE_COMPRESS_FLAGS+set} != "set" ]] ; then
+	case ${PORTAGE_COMPRESS} in
+		bzip2|gzip)  PORTAGE_COMPRESS_FLAGS="-9";;
+	esac
+fi
+
 guess_suffix() {
 	if [[ ! -e ${T}/.ecompress.suffix ]] ; then
 		set -e
@@ -158,16 +168,6 @@ fix_symlinks() {
 
 	return ${ret}
 }
-
-# setup compression stuff
-PORTAGE_COMPRESS=${PORTAGE_COMPRESS-bzip2}
-[[ -z ${PORTAGE_COMPRESS} ]] && exit 0
-
-if [[ ${PORTAGE_COMPRESS_FLAGS+set} != "set" ]] ; then
-	case ${PORTAGE_COMPRESS} in
-		bzip2|gzip)  PORTAGE_COMPRESS_FLAGS="-9";;
-	esac
-fi
 
 ret=0
 while IFS= read -d '' -r path; do
