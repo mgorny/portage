@@ -1,4 +1,4 @@
-# Copyright 2017 Gentoo Foundation
+# Copyright 2017-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 from portage.tests import TestCase
@@ -171,25 +171,25 @@ class BdepsTestCase(TestCase):
 				]
 			),
 
-			# For --depclean, do not remove build-time dependencies by
+			# For --unmerge, do not remove build-time dependencies by
 			# default. Specify --with-bdeps-auto=n, in order to
 			# demonstrate that it does not affect removal actions.
 			ResolverPlaygroundTestCase(
 				[],
 				options = {
-					"--depclean": True,
+					"--unmerge": True,
 					"--with-bdeps-auto": "n",
 				},
 				success = True,
 				cleanlist = [],
 			),
 
-			# For --depclean, remove build-time dependencies if
+			# For --unmerge, remove build-time dependencies if
 			# --with-bdeps=n has been specified.
 			ResolverPlaygroundTestCase(
 				[],
 				options = {
-					"--depclean": True,
+					"--unmerge": True,
 					"--with-bdeps": "n",
 				},
 				success = True,

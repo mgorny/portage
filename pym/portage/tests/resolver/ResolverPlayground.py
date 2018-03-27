@@ -501,8 +501,8 @@ class ResolverPlayground(object):
 			options["--debug"] = True
 
 		if action is None:
-			if options.get("--depclean"):
-				action = "depclean"
+			if options.get("--unmerge"):
+				action = "unmerge"
 			elif options.get("--prune"):
 				action = "prune"
 
@@ -517,7 +517,7 @@ class ResolverPlayground(object):
 				portage.util.noiselimit = -2
 			_emerge.emergelog._disable = True
 
-			if action in ("depclean", "prune"):
+			if action in ("unmerge", "prune"):
 				rval, cleanlist, ordered, req_pkg_count = \
 					calc_depclean(self.settings, self.trees, None,
 					options, action, InternalPackageSet(initial_atoms=atoms, allow_wildcard=True), None)

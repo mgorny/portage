@@ -1,4 +1,4 @@
-# Copyright 2013 Gentoo Foundation
+# Copyright 2013-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 from portage.tests import TestCase
@@ -41,7 +41,7 @@ class SimpleDepcleanTestCase(TestCase):
 			# slot-operator dep).
 			ResolverPlaygroundTestCase(
 				[],
-				options={"--depclean": True},
+				options={"--unmerge": True},
 				success=True,
 				ordered=True,
 				cleanlist=["dev-libs/A-1", "dev-libs/B-1"]),

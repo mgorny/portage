@@ -20,7 +20,7 @@ def create_depgraph_params(myopts, myaction):
 	# rebuild_if_new_slot: rebuild or reinstall packages when
 	#	slot/sub-slot := operator dependencies can be satisfied by a newer
 	#	slot/sub-slot, so that older packages slots will become eligible for
-	#	removal by the --depclean action as soon as possible
+	#	removal by the --unmerge action as soon as possible
 	# ignore_built_slot_operator_deps: ignore the slot/sub-slot := operator parts
 	#	of dependencies that have been recorded when packages where built
 	# ignore_soname_deps: ignore the soname dependencies of built

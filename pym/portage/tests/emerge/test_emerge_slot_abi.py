@@ -140,7 +140,7 @@ class SlotAbiEmergeTestCase(TestCase):
 				os.symlink(true_binary, os.path.join(fake_bin, x))
 			with open(os.path.join(var_cache_edb, "counter"), 'wb') as f:
 				f.write(b"100")
-			# non-empty system set keeps --depclean quiet
+			# non-empty system set keeps --unmerge quiet
 			with open(os.path.join(profile_path, "packages"), 'w') as f:
 				f.write("*dev-libs/token-system-pkg")
 

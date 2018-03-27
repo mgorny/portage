@@ -1,4 +1,4 @@
-# Copyright 2012 Gentoo Foundation
+# Copyright 2012-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 from portage.tests import TestCase
@@ -37,7 +37,7 @@ class DepcleanUnavailableSlotTestCase(TestCase):
 		test_cases = (
 			ResolverPlaygroundTestCase(
 				[],
-				options={"--depclean": True},
+				options={"--unmerge": True},
 				success=True,
 				cleanlist=["sys-kernel/gentoo-sources-3.2.21"]),
 		)
@@ -52,7 +52,7 @@ class DepcleanUnavailableSlotTestCase(TestCase):
 			playground.cleanup()
 
 		# Now make the newer version availale and verify that
-		# the lower version is depcleaned.
+		# the lower version is unmerged.
 		ebuilds.update({
 			"sys-kernel/gentoo-sources-3.2.21": {
 				"SLOT": "3.2.21",
@@ -63,7 +63,7 @@ class DepcleanUnavailableSlotTestCase(TestCase):
 		test_cases = (
 			ResolverPlaygroundTestCase(
 				[],
-				options={"--depclean": True},
+				options={"--unmerge": True},
 				success=True,
 				cleanlist=["sys-kernel/gentoo-sources-3.0.53"]),
 		)

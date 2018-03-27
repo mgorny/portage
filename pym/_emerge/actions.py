@@ -632,7 +632,7 @@ def action_depclean(settings, trees, ldpath_mtimes,
 	msg = []
 	if "preserve-libs" not in settings.features and \
 		not myopts.get("--depclean-lib-check", _DEPCLEAN_LIB_CHECK_DEFAULT) != "n":
-		msg.append("Depclean may break link level dependencies. Thus, it is\n")
+		msg.append("Unmerge may break link level dependencies. Thus, it is\n")
 		msg.append("recommended to use a tool such as " + good("`revdep-rebuild`") + " (from\n")
 		msg.append("app-portage/gentoolkit) in order to detect such breakage.\n")
 		msg.append("\n")
@@ -641,15 +641,15 @@ def action_depclean(settings, trees, ldpath_mtimes,
 	msg.append("be kept.  They can be manually added to this set with\n")
 	msg.append(good("`emerge --noreplace <atom>`") + ".  Packages that are listed in\n")
 	msg.append("package.provided (see portage(5)) will be removed by\n")
-	msg.append("depclean, even if they are part of the world set.\n")
+	msg.append("unmerge, even if they are part of the world set.\n")
 	msg.append("\n")
-	msg.append("As a safety measure, depclean will not remove any packages\n")
+	msg.append("As a safety measure, unmerge will not remove any packages\n")
 	msg.append("unless *all* required dependencies have been resolved.  As a\n")
 	msg.append("consequence of this, it often becomes necessary to run \n")
 	msg.append("%s" % good("`emerge --update --newuse --deep @world`")
-			+ " prior to depclean.\n")
+			+ " prior to unmerge.\n")
 
-	if action == "depclean" and "--quiet" not in myopts and not myfiles:
+	if action == "unmerge" and "--quiet" not in myopts and not myfiles:
 		portage.writemsg_stdout("\n")
 		for x in msg:
 			portage.writemsg_stdout(colorize("WARN", " * ") + x)
@@ -783,8 +783,8 @@ def calc_depclean(settings, trees, ldpath_mtimes,
 			level=logging.ERROR, noiselevel=-1)
 		return 1, [], False, 0
 
-	if action == "depclean":
-		emergelog(xterm_titles, " >>> depclean")
+	if action == "unmerge":
+		emergelog(xterm_titles, " >>> unmerge")
 
 	writemsg_level("\nCalculating dependencies  ")
 	resolver_params = create_depgraph_params(myopts, "remove")
@@ -793,7 +793,7 @@ def calc_depclean(settings, trees, ldpath_mtimes,
 	vardb = resolver._frozen_config.trees[eroot]["vartree"].dbapi
 	real_vardb = trees[eroot]["vartree"].dbapi
 
-	if action == "depclean":
+	if action == "unmerge":
 
 		if args_set:
 
@@ -952,7 +952,7 @@ def calc_depclean(settings, trees, ldpath_mtimes,
 				msg.append("")
 			msg.extend(textwrap.wrap(
 				"Have you forgotten to do a complete update prior " + \
-				"to depclean? The most comprehensive command for this " + \
+				"to unmerge? The most comprehensive command for this " + \
 				"purpose is as follows:", 65
 			))
 			msg.append("")
@@ -1042,7 +1042,7 @@ def calc_depclean(settings, trees, ldpath_mtimes,
 
 		pkgs_to_remove = []
 
-		if action == "depclean":
+		if action == "unmerge":
 			if args_set:
 
 				for pkg in sorted(vardb, key=cmp_sort_key(cmp_pkg_cpv)):
@@ -1082,10 +1082,9 @@ def calc_depclean(settings, trees, ldpath_mtimes,
 				writemsg_level(
 					">>> To see reverse dependencies, use %s\n" % \
 						good("--verbose"))
-			if action == "prune":
-				writemsg_level(
-					">>> To ignore dependencies, use %s\n" % \
-						good("--nodeps"))
+			writemsg_level(
+				">>> To ignore dependencies, use %s\n" % \
+					good("--nodeps"))
 
 		return pkgs_to_remove
 
@@ -2165,11 +2164,12 @@ def action_uninstall(settings, trees, ldpath_mtimes,
 		return 1
 
 	if action == 'unmerge' and \
+		'--nodeps' in opts and \
 		'--quiet' not in opts and \
 		'--quiet-unmerge-warn' not in opts:
 		msg = "This action can remove important packages! " + \
 			"In order to be safer, use " + \
-			"`emerge -pv --depclean <atom>` to check for " + \
+			"`emerge -pv --unmerge <atom>` to check for " + \
 			"reverse dependencies before removing packages."
 		out = portage.output.EOutput()
 		for line in textwrap.wrap(msg, 72):
@@ -2193,8 +2193,8 @@ def action_uninstall(settings, trees, ldpath_mtimes,
 		settings.backup_changes("PORTAGE_BACKGROUND")
 		settings.lock()
 
-	if action in ('clean', 'unmerge') or \
-		(action == 'prune' and "--nodeps" in opts):
+	if action == 'clean' or \
+		(action in ('prune', 'unmerge') and "--nodeps" in opts):
 		# When given a list of atoms, unmerge them in the order given.
 		ordered = action == 'unmerge'
 		rval = unmerge(trees[settings['EROOT']]['root_config'], opts, action,
@@ -2697,7 +2697,7 @@ def expand_set_arguments(myfiles, myaction, root_config):
 	for e in setconfig.errors:
 		print(colorize("BAD", "Error during set creation: %s" % e))
 
-	unmerge_actions = ("unmerge", "prune", "clean", "depclean")
+	unmerge_actions = ("unmerge", "prune", "clean")
 
 	for a in myfiles:
 		if a.startswith(SETPREFIX):
@@ -2964,7 +2964,7 @@ def run_action(emerge_config):
 
 	# only expand sets for actions taking package arguments
 	oldargs = emerge_config.args[:]
-	if emerge_config.action in ("clean", "config", "depclean",
+	if emerge_config.action in ("clean", "config",
 		"info", "prune", "unmerge", None):
 		newargs, retval = expand_set_arguments(
 			emerge_config.args, emerge_config.action,
@@ -3045,7 +3045,7 @@ def run_action(emerge_config):
 		# We've already allowed "--version" and "--help" above.
 		if "--pretend" not in emerge_config.opts and \
 			emerge_config.action not in ("search", "info"):
-			need_superuser = emerge_config.action in ('clean', 'depclean',
+			need_superuser = emerge_config.action in ('clean',
 				'deselect', 'prune', 'unmerge') or not \
 				(fetchonly or \
 				(buildpkgonly and portage.data.secpass >= 1) or \
@@ -3192,7 +3192,7 @@ def run_action(emerge_config):
 			emerge_config.opts, emerge_config.args, spinner)
 
 	elif emerge_config.action in \
-		('clean', 'depclean', 'deselect', 'prune', 'unmerge'):
+		('clean', 'deselect', 'prune', 'unmerge'):
 		validate_ebuild_environment(emerge_config.trees)
 		rval = action_uninstall(emerge_config.target_config.settings,
 			emerge_config.trees, emerge_config.target_config.mtimedb["ldpath"],

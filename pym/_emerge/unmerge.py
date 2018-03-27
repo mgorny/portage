@@ -180,7 +180,7 @@ def _unmerge_display(root_config, myopts, unmerge_action,
 			writemsg_level(darkgreen(newline+\
 				">>> These are the packages that would be unmerged:\n"))
 
-		# Preservation of order is required for --depclean and --prune so
+		# Preservation of order is required for --unmerge and --prune so
 		# that dependencies are respected. Use all_selected to eliminate
 		# duplicate packages since the same package may be selected by
 		# multiple atoms.

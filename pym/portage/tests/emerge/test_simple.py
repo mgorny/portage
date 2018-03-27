@@ -1,4 +1,4 @@
-# Copyright 2011-2015 Gentoo Foundation
+# Copyright 2011-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 import subprocess
@@ -279,9 +279,11 @@ pkg_preinst() {
 			emerge_cmd + ("--noreplace", "dev-libs/A",),
 			emerge_cmd + ("--config", "dev-libs/A",),
 			emerge_cmd + ("--info", "dev-libs/A", "dev-libs/B"),
-			emerge_cmd + ("--pretend", "--depclean", "--verbose", "dev-libs/B"),
-			emerge_cmd + ("--pretend", "--depclean",),
+			emerge_cmd + ("--pretend", "--unmerge", "--verbose", "dev-libs/B"),
+			emerge_cmd + ("--pretend", "--unmerge",),
+			# deprecated alias
 			emerge_cmd + ("--depclean",),
+			emerge_cmd + ("--unmerge",),
 			quickpkg_cmd + ("--include-config", "y", "dev-libs/A",),
 			# Test bug #523684, where a file renamed or removed by the
 			# admin forces replacement files to be merged with config
@@ -417,7 +419,7 @@ pkg_preinst() {
 					os.path.join(eprefix, "etc", x))
 			with open(os.path.join(var_cache_edb, "counter"), 'wb') as f:
 				f.write(b"100")
-			# non-empty system set keeps --depclean quiet
+			# non-empty system set keeps --unmerge quiet
 			with open(os.path.join(profile_path, "packages"), 'w') as f:
 				f.write("*dev-libs/token-system-pkg")
 			for cp, xml_data in metadata_xml_files:

@@ -1,4 +1,4 @@
-# Copyright 2010 Gentoo Foundation
+# Copyright 2010-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 from portage.tests import TestCase
@@ -23,7 +23,7 @@ class SimpleDepcleanTestCase(TestCase):
 		test_cases = (
 			ResolverPlaygroundTestCase(
 				[],
-				options={"--depclean": True},
+				options={"--unmerge": True},
 				success=True,
 				cleanlist=["dev-libs/B-1"]),
 			)
@@ -63,7 +63,7 @@ class DepcleanWithDepsTestCase(TestCase):
 		test_cases = (
 			ResolverPlaygroundTestCase(
 				[],
-				options={"--depclean": True},
+				options={"--unmerge": True},
 				success=True,
 				cleanlist=["dev-libs/B-1", "dev-libs/D-1",
 					"dev-libs/E-1", "dev-libs/F-1"]),
@@ -104,7 +104,7 @@ class DepcleanWithInstalledMaskedTestCase(TestCase):
 		test_cases = (
 			ResolverPlaygroundTestCase(
 				[],
-				options={"--depclean": True},
+				options={"--unmerge": True},
 				success=True,
 				#cleanlist=["dev-libs/C-1"]),
 				cleanlist=["dev-libs/B-1"]),
@@ -122,7 +122,7 @@ class DepcleanInstalledKeywordMaskedSlotTestCase(TestCase):
 
 	def testDepcleanInstalledKeywordMaskedSlot(self):
 		"""
-		Verify that depclean removes newer slot
+		Verify that unmerge removes newer slot
 		masked by KEYWORDS (see bug #350285).
 		"""
 		ebuilds = {
@@ -143,7 +143,7 @@ class DepcleanInstalledKeywordMaskedSlotTestCase(TestCase):
 		test_cases = (
 			ResolverPlaygroundTestCase(
 				[],
-				options={"--depclean": True},
+				options={"--unmerge": True},
 				success=True,
 				cleanlist=["dev-libs/B-2.7"]),
 			)
@@ -165,36 +165,36 @@ class DepcleanWithExcludeTestCase(TestCase):
 			"dev-libs/B-1": { "RDEPEND": "dev-libs/A" },
 			}
 
-		# depclean asserts non-empty @world set
+		# unmerge asserts non-empty @world set
 		world = ["non-empty/world-set"]
 
 		test_cases = (
 			#Without --exclude.
 			ResolverPlaygroundTestCase(
 				[],
-				options={"--depclean": True},
+				options={"--unmerge": True},
 				success=True,
 				cleanlist=["dev-libs/B-1", "dev-libs/A-1"]),
 			ResolverPlaygroundTestCase(
 				["dev-libs/A"],
-				options={"--depclean": True},
+				options={"--unmerge": True},
 				success=True,
 				cleanlist=[]),
 			ResolverPlaygroundTestCase(
 				["dev-libs/B"],
-				options={"--depclean": True},
+				options={"--unmerge": True},
 				success=True,
 				cleanlist=["dev-libs/B-1"]),
 
 			#With --exclude
 			ResolverPlaygroundTestCase(
 				[],
-				options={"--depclean": True, "--exclude": ["dev-libs/A"]},
+				options={"--unmerge": True, "--exclude": ["dev-libs/A"]},
 				success=True,
 				cleanlist=["dev-libs/B-1"]),
 			ResolverPlaygroundTestCase(
 				["dev-libs/B"],
-				options={"--depclean": True, "--exclude": ["dev-libs/B"]},
+				options={"--unmerge": True, "--exclude": ["dev-libs/B"]},
 				success=True,
 				cleanlist=[]),
 			)
@@ -224,17 +224,17 @@ class DepcleanWithExcludeAndSlotsTestCase(TestCase):
 			#Without --exclude.
 			ResolverPlaygroundTestCase(
 				[],
-				options={"--depclean": True},
+				options={"--unmerge": True},
 				success=True,
 				cleanlist=["dev-libs/Y-1", "dev-libs/Z-1"]),
 			ResolverPlaygroundTestCase(
 				[],
-				options={"--depclean": True, "--exclude": ["dev-libs/Z"]},
+				options={"--unmerge": True, "--exclude": ["dev-libs/Z"]},
 				success=True,
 				cleanlist=["dev-libs/Y-1"]),
 			ResolverPlaygroundTestCase(
 				[],
-				options={"--depclean": True, "--exclude": ["dev-libs/Y"]},
+				options={"--unmerge": True, "--exclude": ["dev-libs/Y"]},
 				success=True,
 				cleanlist=[]),
 			)
@@ -256,28 +256,28 @@ class DepcleanAndWildcardsTestCase(TestCase):
 			"dev-libs/B-1": {},
 			}
 
-		# depclean asserts non-empty @world set
+		# unmerge asserts non-empty @world set
 		world = ["non-empty/world-set"]
 
 		test_cases = (
 			ResolverPlaygroundTestCase(
 				["*/*"],
-				options={"--depclean": True},
+				options={"--unmerge": True},
 				success=True,
 				cleanlist=["dev-libs/A-1", "dev-libs/B-1"]),
 			ResolverPlaygroundTestCase(
 				["dev-libs/*"],
-				options={"--depclean": True},
+				options={"--unmerge": True},
 				success=True,
 				cleanlist=["dev-libs/A-1", "dev-libs/B-1"]),
 			ResolverPlaygroundTestCase(
 				["*/A"],
-				options={"--depclean": True},
+				options={"--unmerge": True},
 				success=True,
 				cleanlist=["dev-libs/A-1"]),
 			ResolverPlaygroundTestCase(
 				["*/B"],
-				options={"--depclean": True},
+				options={"--unmerge": True},
 				success=True,
 				cleanlist=[]),
 			)

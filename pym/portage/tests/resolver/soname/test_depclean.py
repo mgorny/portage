@@ -30,7 +30,7 @@ class SonameDepcleanTestCase(TestCase):
 			ResolverPlaygroundTestCase(
 				[],
 				options={
-					"--depclean": True,
+					"--unmerge": True,
 					"--ignore-soname-deps": "n",
 				},
 				success=True,
@@ -40,7 +40,7 @@ class SonameDepcleanTestCase(TestCase):
 			ResolverPlaygroundTestCase(
 				[],
 				options={
-					"--depclean": True,
+					"--unmerge": True,
 					"--ignore-soname-deps": "y",
 				},
 				success=True,

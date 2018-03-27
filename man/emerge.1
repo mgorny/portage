@@ -123,41 +123,12 @@ Run package specific actions needed to be executed after the emerge process
 has completed.  This usually entails configuration file setup or other similar
 setups that the user may wish to run.
 .TP
-.BR \-\-depclean ", " \-c
-Cleans the system by removing packages that are not associated
-with explicitly merged packages. Depclean works by creating the
-full dependency tree from the @world set,
-then comparing it to installed packages. Packages installed, but
-not part of the dependency tree, will be uninstalled by depclean.
-See \fB\-\-with\-bdeps\fR for behavior with respect to build time dependencies
-that are not strictly required. Packages that are part of the world set will
-always be kept. They can be manually added to this set with \fIemerge
-\-\-noreplace <atom>\fR. As a safety measure, depclean will not remove any
-packages unless *all* required dependencies have been resolved. As a
-consequence, it is often necessary to run \fIemerge \-\-update \-\-newuse
-\-\-deep @world\fR prior to depclean. Also note that
-depclean may break link level dependencies, especially when the
-\fB\-\-depclean\-lib\-check\fR option is disabled. Thus, it is
-recommended to use a tool such as \fBrevdep-rebuild\fR(1)
-in order to detect such breakage.
-
-\fBWARNING:\fR
-Inexperienced users are advised to use \fB\-\-pretend\fR or \fB\-\-ask\fR
-with this option in order to see a preview of which packages
-will be uninstalled. Always study the list of packages
-to be cleaned for any obvious mistakes. Note that packages listed in
-package.provided (see \fBportage\fR(5)) may be removed by
-depclean, even if they are part of the world set.
-
-Depclean serves as a dependency aware
-version of \fB\-\-unmerge\fR. When given one or more atoms, it will
-unmerge matched packages that have no reverse dependencies. Use
-\fB\-\-depclean\fR together with \fB\-\-verbose\fR to show reverse
-dependencies.
+.BR \-\-depclean ", " \-C
+Deprecated aliases to \fB\-\-unmerge\fR.
 .TP
 .BR "\-\-deselect [ y | n ]"
 Remove atoms and/or sets from the world file. This action is implied
-by uninstall actions, including \fB-\-depclean\fR,
+by uninstall actions, including 
 \fB-\-prune\fR and \fB-\-unmerge\fR. Use \fB-\-deselect=n\fR
 in order to prevent uninstall actions from removing
 atoms from the world file.
@@ -193,8 +164,8 @@ Removes all but the highest installed version of a package from your
 system. Use \fB\-\-prune\fR together with \fB\-\-verbose\fR to show
 reverse dependencies or with \fB\-\-nodeps\fR to ignore all dependencies.
 \fBWARNING: This action can remove packages from your world file! Check
-the emerge output of the next \-\-depclean run carefully! Use
-\-\-depclean to avoid this issue.\fR
+the emerge output of the next \-\-unmerge run carefully! Use
+\-\-unmerge to avoid this issue.\fR
 .TP
 .BR \-\-regen
 Causes portage to check and update the dependency cache of all ebuilds in the
@@ -268,13 +239,42 @@ portage tree as a tarball, which is much faster than emerge
 \-\-sync for first time syncs.
 
 .TP
-.BR \-\-unmerge ", " \-C
-\fBWARNING: This action can remove important packages!\fR Removes
-all matching packages following a counter governed by \fBCLEAN_DELAY\fR.
-This does no checking of dependencies, so it may remove packages necessary
-for the proper operation of your system.  Its arguments can be \fIatoms\fR
-or \fIebuilds\fR. For a dependency aware version of \fB\-\-unmerge\fR, use
-\fB\-\-depclean\fR or \fB\-\-prune\fR.
+.BR \-\-unmerge ", " \-c
+Has two modes of operation. If any packages are specified on the command-line,
+removes the specified packages. Otherwise, attempts to remove all unused
+installed packages.
+
+Only packages that are not required by the explicitly merged packages will be
+uninstalled by default. It works by creating the full dependency tree from
+the @world set, then comparing it to requested uninstalls. Packages installed,
+but not part of the dependency tree, will be uninstalled.
+See \fB\-\-with\-bdeps\fR for behavior with respect to build time dependencies
+that are not strictly required. Packages that are part of the world set will
+always be kept. They can be manually added to this set with \fIemerge
+\-\-noreplace <atom>\fR. As a safety measure, unmerge will not remove any
+packages unless *all* required dependencies have been resolved. As a
+consequence, it is often necessary to run \fIemerge \-\-update \-\-newuse
+\-\-deep @world\fR prior to unmerge. Also note that
+unmerge may break link level dependencies, especially when the
+\fB\-\-depclean\-lib\-check\fR option is disabled. Thus, it is
+recommended to use a tool such as \fBrevdep-rebuild\fR(1)
+in order to detect such breakage.
+
+\fBWARNING:\fR
+Inexperienced users are advised to use \fB\-\-pretend\fR or \fB\-\-ask\fR
+with this option in order to see a preview of which packages
+will be uninstalled. Always study the list of packages
+to be cleaned for any obvious mistakes. Note that packages listed in
+package.provided (see \fBportage\fR(5)) may be removed by
+depclean, even if they are part of the world set.
+
+Use \fB\-\-verbose\fR to show reverse dependencies of packages whose removal
+was not possible.
+
+Use \fB\-\-nodeps\fR to ignore reverse dependencies and force removing
+packages. \fBWARNING: This can remove important packages!\fR
+When \fB\-\-nodeps\fR is used, the removal is preceded by a count
+of \fBCLEAN_DELAY\fR.
 .TP
 .BR \-\-version ", " \-V
 Displays the version number of \fBemerge\fR.
@@ -532,7 +532,7 @@ required.
 .TP
 .BR "\-\-depclean\-lib\-check [ y | n ]"
 Account for library link-level dependencies during
-\fB\-\-depclean\fR and \fB\-\-prune\fR actions.
+\fB\-\-unmerge\fR and \fB\-\-prune\fR actions.
 This option is enabled by default. If FEATURES="preserve\-libs" is
 enabled in \fBmake.conf\fR(5), and preserve\-libs is not restricted
 for any of the packages selected for removal, then this option is
@@ -741,7 +741,7 @@ for later updating.
 
 \fBWARNING:\fR This option should only be used for packages that are
 reachable from the @world package set (those that would not be removed
-by \fB\-\-depclean\fR), since dependencies of unreachable packages are
+by \fB\-\-unmerge\fR), since dependencies of unreachable packages are
 allowed to be broken when satisfying dependencies of other packages.
 Broken dependencies of this sort will invalidate assumptions that make
 it possible for \fB\-\-deep\fR to be disabled by default.
@@ -844,7 +844,7 @@ has no effect unless \fB\-\-ask\fR is enabled.
 Automatically rebuild or reinstall packages when slot/sub\-slot :=
 operator dependencies can be satisfied by a newer slot, so that
 older packages slots will become eligible for removal by the
-\-\-depclean action as soon as possible. This option only
+\-\-unmerge action as soon as possible. This option only
 affects packages that specify slot/sub\-slot := dependencies
 which are supported beginning with \fBEAPI 5\fR.
 Since this option requires
@@ -1023,7 +1023,7 @@ The default is set to "y" (on).
 In dependency calculations, pull in build time dependencies
 that are not strictly required. This option is automatically enabled for
 installation actions, meaning they will be installed, and defaults to
-\(aqy\(aq for the \fB\-\-depclean\fR action, meaning they will not be
+\(aqy\(aq for the \fB\-\-unmerge\fR action, meaning they will not be
 removed. In order to prevent the \fB\-\-with\-bdeps\fR option from being
 automatically enabled for installation actions, specify
 \fB\-\-with\-bdeps\-auto=n\fR in either the command line or
@@ -1052,11 +1052,11 @@ overridden via the command line.
 
 \fBNOTE:\fR The program logic that causes \fB\-\-with\-bdeps\fR to be
 automatically enabled for installation actions does not affect removal
-actions such as the \fB\-\-depclean\fR action. Therefore, when
+actions such as the \fB\-\-unmerge\fR action. Therefore, when
 \fB\-\-with\-bdeps\-auto=n\fR is specified in \fBEMERGE_DEFAULT_OPTS\fR,
 it does not affect the default \fB\-\-with\-bdeps=y\fR setting that
-applies to the \fB\-\-depclean\fR action. The default
-\fB\-\-with\-bdeps=y\fR setting that applies to the \fB\-\-depclean\fR
+applies to the \fB\-\-unmerge\fR action. The default
+\fB\-\-with\-bdeps=y\fR setting that applies to the \fB\-\-unmerge\fR
 action can be overridden only by specifying \fB\-\-with\-bdeps=n\fR.
 .TP
 .BR "\-\-with\-test\-deps [ y | n ]"

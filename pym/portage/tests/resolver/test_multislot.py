@@ -1,4 +1,4 @@
-# Copyright 2010 Gentoo Foundation
+# Copyright 2010-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 from portage.tests import TestCase
@@ -35,10 +35,10 @@ class MultSlotTestCase(TestCase):
 					mergelist = [],
 					success = True),
 
-				# depclean test for bug #382823
+				# unmerge test for bug #382823
 				ResolverPlaygroundTestCase(
 					[],
-					options = {"--depclean": True},
+					options = {"--unmerge": True},
 					success = True,
 					cleanlist = []),
 			)

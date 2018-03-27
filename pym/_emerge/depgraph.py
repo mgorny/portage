@@ -6724,7 +6724,7 @@ class depgraph(object):
 		currently only enabled by the --complete-graph option.
 
 		@param required_sets: contains required sets (currently only used
-			for depclean and prune removal operations)
+			for unmerge and prune removal operations)
 		@type required_sets: dict
 		"""
 		if "--buildpkgonly" in self._frozen_config.myopts or \
@@ -7014,7 +7014,7 @@ class depgraph(object):
 					# Check for masked installed packages. Only warn about
 					# packages that are in the graph in order to avoid warning
 					# about those that will be automatically uninstalled during
-					# the merge process or by --depclean. Always warn about
+					# the merge process or by --unmerge. Always warn about
 					# packages masked by license, since the user likely wants
 					# to adjust ACCEPT_LICENSE.
 					if pkg in self._dynamic_config._package_tracker:

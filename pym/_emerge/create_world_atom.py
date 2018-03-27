@@ -74,7 +74,7 @@ def create_world_atom(pkg, args_set, root_config):
 		# doesn't want the SLOT atom recorded in the world file
 		# (case 1 above).  If it's only available in the vardb,
 		# the user may be trying to prevent a USE=multislot
-		# package from being removed by --depclean (case 2 above).
+		# package from being removed by --unmerge (case 2 above).
 
 		mydb = portdb
 		if not portdb.match(slot_atom):
@@ -117,7 +117,7 @@ def create_world_atom(pkg, args_set, root_config):
 				return None
 			# System virtuals aren't safe to exclude from world since they can
 			# match multiple old-style virtuals but only one of them will be
-			# pulled in by update or depclean.
+			# pulled in by update or unmerge.
 			providers = portdb.settings.getvirtuals().get(system_atom.cp)
 			if providers and len(providers) == 1 and \
 				providers[0].cp == arg_atom.cp:

@@ -1,4 +1,4 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 from __future__ import print_function
@@ -20,6 +20,6 @@ def help():
 	print("          [ "+green("--newrepo")+"   ] [ "+green("--newuse")+"     ] [ "+green("--noconfmem")+"  ] [ "+green("--nospinner")+"   ]")
 	print("          [ "+green("--oneshot")+"   ] [ "+green("--onlydeps")+"   ] [ "+ green("--quiet-build")+" [ " + turquoise("y") + " | "+ turquoise("n")+" ]        ]")
 	print("          [ "+green("--reinstall ")+turquoise("changed-use")+"      ] [ " + green("--with-bdeps")+" < " + turquoise("y") + " | "+ turquoise("n")+" >         ]")
-	print(bold("Actions:")+"  [ "+green("--depclean")+" | "+green("--list-sets")+" | "+green("--search")+" | "+green("--sync")+" | "+green("--version")+"        ]")
+	print(bold("Actions:")+"  [ "+green("--unmerge")+" | "+green("--list-sets")+" | "+green("--search")+" | "+green("--sync")+" | "+green("--version")+"        ]")
 	print()
 	print("   For more help consult the man page.")

@@ -56,7 +56,7 @@ options=[
 shortmapping={
 "1":"--oneshot",
 "B":"--buildpkgonly",
-"c":"--depclean",
+"c":"--unmerge",
 "C":"--unmerge",
 "d":"--debug",
 "e":"--emptytree",
@@ -301,13 +301,14 @@ def parse_opts(tmpcmdline, silent=False):
 	myfiles=[]
 
 	actions = frozenset([
-		"clean", "check-news", "config", "depclean", "help",
+		"clean", "check-news", "config", "help",
 		"info", "list-sets", "metadata", "moo",
 		"prune", "regen",  "search",
 		"sync",  "unmerge", "version",
 	])
 
-	longopt_aliases = {"--cols":"--columns", "--skip-first":"--skipfirst"}
+	longopt_aliases = {"--cols":"--columns", "--skip-first":"--skipfirst",
+		"--depclean":"--unmerge"}
 	y_or_n = ("y", "n")
 	true_y_or_n = ("True", "y", "n")
 	true_y = ("True", "y")

@@ -1,4 +1,4 @@
-# Copyright 2011 Gentoo Foundation
+# Copyright 2011-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 from portage.tests import TestCase
@@ -190,12 +190,12 @@ class VirtualSlotResolverTestCase(TestCase):
 		world = ("virtual/jdk:1.6", "app-misc/java-app",)
 
 		test_cases = (
-			# Make sure that depclean doesn't remove a new slot even though
+			# Make sure that unmerge doesn't remove a new slot even though
 			# it is redundant in the sense that the older slot will satisfy
 			# all dependencies.
 			ResolverPlaygroundTestCase(
 				[],
-				options = {"--depclean" : True},
+				options = {"--unmerge" : True},
 				success = True,
 				cleanlist = []),
 

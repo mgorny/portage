@@ -1,4 +1,4 @@
-# Copyright 2014 Gentoo Foundation
+# Copyright 2014-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 from __future__ import unicode_literals
@@ -87,7 +87,7 @@ class ProfilePackageSetTestCase(TestCase):
 
 			ResolverPlaygroundTestCase(
 				[],
-				options={"--depclean": True},
+				options={"--unmerge": True},
 				success=True,
 				cleanlist=["app-misc/B-1"]
 			),

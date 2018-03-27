@@ -49,7 +49,7 @@ def display_news_notification(root_config, myopts):
 def show_depclean_suggestion():
 	out = portage.output.EOutput()
 	msg = "After world updates, it is important to remove " + \
-		"obsolete packages with emerge --depclean. Refer " + \
+		"obsolete packages with emerge --unmerge. Refer " + \
 		"to `man emerge` for more information."
 	for line in textwrap.wrap(msg, 72):
 		out.ewarn(line)

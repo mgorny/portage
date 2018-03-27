@@ -1,4 +1,4 @@
-# Copyright 2017 Gentoo Foundation
+# Copyright 2017-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 from portage.tests import TestCase
@@ -118,7 +118,7 @@ class SlotOperatorExclusiveSlotsTestCase(TestCase):
 			# missed update from llvm:0 to llvm:4. Since llvm:4 does
 			# not have a dependency on clang, the upgrade from llvm:0
 			# to llvm:4 makes the installed sys-devel/clang-3.9.1-r100
-			# instance eligible for removal by emerge --depclean, which
+			# instance eligible for removal by emerge --unmerge, which
 			# explains why clang does not appear in the mergelist.
 			ResolverPlaygroundTestCase(
 				["@world"],

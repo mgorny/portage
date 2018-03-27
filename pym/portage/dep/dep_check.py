@@ -662,7 +662,7 @@ def dep_zapdeps(unreduced, reduced, myroot, use_binaries=0, trees=None,
 	# to the left. Sorting is done separately for each of choice_bins, so
 	# as not to interfere with the ordering of the bins. Because of the
 	# bin separation, the main function of this code is to allow
-	# --depclean to remove old slots (rather than to pull in new slots).
+	# --unmerge to remove old slots (rather than to pull in new slots).
 	for choices in choice_bins:
 		if len(choices) < 2:
 			continue
@@ -673,7 +673,7 @@ def dep_zapdeps(unreduced, reduced, myroot, use_binaries=0, trees=None,
 
 		if minimize_slots:
 			# Prefer choices having fewer new slots. When used with DNF form,
-			# this can eliminate unecessary packages that depclean would
+			# this can eliminate unecessary packages that unmerge would
 			# ultimately eliminate (see bug 632026). Only use this behavior
 			# when deemed necessary by the caller, since this will discard the
 			# order specified in the ebuild, and the preferences specified
@@ -785,7 +785,7 @@ def dep_check(depstring, mydbapi, mysettings, use="yes", mode=None, myuse=None,
 		# Don't pass the eapi argument to use_reduce() for installed packages
 		# since previous validation will have already marked them as invalid
 		# when necessary and now we're more interested in evaluating
-		# dependencies so that things like --depclean work as well as possible
+		# dependencies so that things like --unmerge work as well as possible
 		# in spite of partial invalidity.
 		if not current_parent.installed:
 			eapi = current_parent.eapi

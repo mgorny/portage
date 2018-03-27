@@ -1,4 +1,4 @@
-# Copyright 2016 Gentoo Foundation
+# Copyright 2016-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 import subprocess
@@ -121,7 +121,7 @@ src_install() {
 				os.symlink(true_binary, os.path.join(fake_bin, x))
 			with open(os.path.join(var_cache_edb, "counter"), 'wb') as f:
 				f.write(b"100")
-			# non-empty system set keeps --depclean quiet
+			# non-empty system set keeps --unmerge quiet
 			with open(os.path.join(profile_path, "packages"), 'w') as f:
 				f.write("*dev-libs/token-system-pkg")
 
