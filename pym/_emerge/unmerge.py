@@ -92,7 +92,7 @@ def _unmerge_display(root_config, myopts, unmerge_action,
 		syslist = frozenset(syslist)
 
 		if not unmerge_files:
-			if unmerge_action in ["rage-clean", "unmerge"]:
+			if unmerge_action == "unmerge":
 				print()
 				print(bold("emerge %s" % unmerge_action) +
 						" can only be used with specific package names")
@@ -211,7 +211,7 @@ def _unmerge_display(root_config, myopts, unmerge_action,
 			pkgmap.append(
 				{"protected": set(), "selected": set(), "omitted": set()})
 			mykey = len(pkgmap) - 1
-			if unmerge_action in ["rage-clean", "unmerge"]:
+			if unmerge_action == "unmerge":
 					for y in mymatch:
 						if y not in all_selected:
 							pkgmap[mykey]["selected"].add(y)
@@ -553,8 +553,7 @@ def unmerge(root_config, myopts, unmerge_action,
 			level=logging.ERROR, noiselevel=-1)
 		return 1
 
-	#the real unmerging begins, after a short delay unless we're raging....
-	if not unmerge_action == "rage-clean" and clean_delay and not autoclean:
+	if clean_delay and not autoclean:
 		countdown(int(settings["CLEAN_DELAY"]), ">>> Unmerging")
 
 	all_selected = set()

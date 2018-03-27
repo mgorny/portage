@@ -2037,7 +2037,7 @@ def action_sync(emerge_config, trees=DeprecationWarning,
 def action_uninstall(settings, trees, ldpath_mtimes,
 	opts, action, files, spinner):
 	# For backward compat, some actions do not require leading '='.
-	ignore_missing_eq = action in ('clean', 'rage-clean', 'unmerge')
+	ignore_missing_eq = action in ('clean', 'unmerge')
 	root = settings['ROOT']
 	eroot = settings['EROOT']
 	vardb = trees[settings['EROOT']]['vartree'].dbapi
@@ -2193,10 +2193,10 @@ def action_uninstall(settings, trees, ldpath_mtimes,
 		settings.backup_changes("PORTAGE_BACKGROUND")
 		settings.lock()
 
-	if action in ('clean', 'rage-clean', 'unmerge') or \
+	if action in ('clean', 'unmerge') or \
 		(action == 'prune' and "--nodeps" in opts):
 		# When given a list of atoms, unmerge them in the order given.
-		ordered = action in ('rage-clean', 'unmerge')
+		ordered = action == 'unmerge'
 		rval = unmerge(trees[settings['EROOT']]['root_config'], opts, action,
 			valid_atoms, ldpath_mtimes, ordered=ordered,
 			scheduler=sched_iface)
@@ -2697,7 +2697,7 @@ def expand_set_arguments(myfiles, myaction, root_config):
 	for e in setconfig.errors:
 		print(colorize("BAD", "Error during set creation: %s" % e))
 
-	unmerge_actions = ("unmerge", "prune", "clean", "depclean", "rage-clean")
+	unmerge_actions = ("unmerge", "prune", "clean", "depclean")
 
 	for a in myfiles:
 		if a.startswith(SETPREFIX):
@@ -2965,7 +2965,7 @@ def run_action(emerge_config):
 	# only expand sets for actions taking package arguments
 	oldargs = emerge_config.args[:]
 	if emerge_config.action in ("clean", "config", "depclean",
-		"info", "prune", "unmerge", "rage-clean", None):
+		"info", "prune", "unmerge", None):
 		newargs, retval = expand_set_arguments(
 			emerge_config.args, emerge_config.action,
 			emerge_config.target_config)
@@ -3046,7 +3046,7 @@ def run_action(emerge_config):
 		if "--pretend" not in emerge_config.opts and \
 			emerge_config.action not in ("search", "info"):
 			need_superuser = emerge_config.action in ('clean', 'depclean',
-				'deselect', 'prune', 'unmerge', "rage-clean") or not \
+				'deselect', 'prune', 'unmerge') or not \
 				(fetchonly or \
 				(buildpkgonly and portage.data.secpass >= 1) or \
 				emerge_config.action in ("metadata", "regen", "sync"))
@@ -3192,7 +3192,7 @@ def run_action(emerge_config):
 			emerge_config.opts, emerge_config.args, spinner)
 
 	elif emerge_config.action in \
-		('clean', 'depclean', 'deselect', 'prune', 'unmerge', 'rage-clean'):
+		('clean', 'depclean', 'deselect', 'prune', 'unmerge'):
 		validate_ebuild_environment(emerge_config.trees)
 		rval = action_uninstall(emerge_config.target_config.settings,
 			emerge_config.trees, emerge_config.target_config.mtimedb["ldpath"],

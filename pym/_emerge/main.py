@@ -303,7 +303,7 @@ def parse_opts(tmpcmdline, silent=False):
 	actions = frozenset([
 		"clean", "check-news", "config", "depclean", "help",
 		"info", "list-sets", "metadata", "moo",
-		"prune", "rage-clean", "regen",  "search",
+		"prune", "regen",  "search",
 		"sync",  "unmerge", "version",
 	])
 
