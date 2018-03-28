@@ -359,15 +359,21 @@ do
 	[[ -z ${f} ]] && continue
 
 	if ! ${SKIP_STRIP} ; then
-		# The noglob funk is to support STRIP_MASK="/*/booga" and to keep
-		#  the for loop from expanding the globs.
-		# The eval echo is to support STRIP_MASK="/*/{booga,bar}" sex.
-		set -o noglob
 		strip_this=true
-		for m in $(eval echo ${STRIP_MASK}) ; do
-			[[ ${x#${ED%/}} == ${m} ]] && strip_this=false && break
-		done
-		set +o noglob
+		if ! ___eapi_has_dostrip; then
+			# The noglob funk is to support STRIP_MASK="/*/booga" and to keep
+			#  the for loop from expanding the globs.
+			# The eval echo is to support STRIP_MASK="/*/{booga,bar}" sex.
+			set -o noglob
+			for m in $(eval echo ${STRIP_MASK}) ; do
+				[[ ${x#${ED%/}} == ${m} ]] && strip_this=false && break
+			done
+			set +o noglob
+		else
+			if [[ -n ${STRIP_MASK} ]]; then
+			   die "STRIP_MASK Is banned in EAPI ${EAPI}"
+			fi
+		fi
 	else
 		strip_this=false
 	fi
@@ -435,4 +441,3 @@ fi
 
 cd "${T}"
 rm -rf "${tmpdir}"
-
