@@ -340,10 +340,9 @@ else
 fi
 cd "${tmpdir}/inodes" || die "cd failed unexpectedly"
 while IFS= read -d '' -r x ; do
-	rm -f "${x}" || die
 	inode_link=$(get_inode_number "${x%.estrip}") || die "stat failed unexpectedly"
 	echo "${x%.estrip}" >> "${inode_link}" || die "echo failed unexpectedly"
-done < <(find "${ED}" -name '*.estrip' -print0)
+done < <(find "${ED}" -name '*.estrip' -delete -print0)
 
 # Now we look for unstripped binaries.
 for inode_link in $(shopt -s nullglob; echo *) ; do

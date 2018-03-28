@@ -180,10 +180,9 @@ ret=0
 while IFS= read -d '' -r path; do
 	file_path=${path%.ecompress}
 
-	rm -f "${path}"
 	compress_file "${file_path}"
 	: $(( ret |= ${?} ))
-done < <(find "${ED}" -name '*.ecompress' -print0 || die)
+done < <(find "${ED}" -name '*.ecompress' -delete -print0 || die)
 
 fix_symlinks
 : $(( ret |= ${?} ))
