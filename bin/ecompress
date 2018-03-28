@@ -78,69 +78,28 @@ if [[ ${PORTAGE_COMPRESS_FLAGS+set} != "set" ]] ; then
 fi
 
 guess_suffix() {
-	if [[ ! -e ${T}/.ecompress.suffix ]] ; then
-		set -e
-		tmpdir="${T}"/.ecompress$$.${RANDOM}
-		mkdir "${tmpdir}"
-		cd "${tmpdir}"
-		# we have to fill the file enough so that there is something
-		# to compress as some programs will refuse to do compression
-		# if it cannot actually compress the file
-		echo {0..1000} > compressme
-		${PORTAGE_COMPRESS} ${PORTAGE_COMPRESS_FLAGS} compressme > /dev/null
-		# If PORTAGE_COMPRESS_FLAGS contains -k then we need to avoid
-		# having our glob match the uncompressed file here.
-		suffix=$(echo compressme.*)
-		[[ -z $suffix || "$suffix" == "compressme.*" ]] && \
-			suffix=$(echo compressme*)
-		suffix=${suffix#compressme}
-		cd /
-		rm -rf "${tmpdir}"
-		echo "${suffix}" > "${T}/.ecompress.suffix"
-	fi
-	cat "${T}/.ecompress.suffix"
+	set -e
+	tmpdir="${T}"/.ecompress$$.${RANDOM}
+	mkdir "${tmpdir}"
+	cd "${tmpdir}"
+	# we have to fill the file enough so that there is something
+	# to compress as some programs will refuse to do compression
+	# if it cannot actually compress the file
+	echo {0..1000} > compressme
+	${PORTAGE_COMPRESS} ${PORTAGE_COMPRESS_FLAGS} compressme > /dev/null
+	# If PORTAGE_COMPRESS_FLAGS contains -k then we need to avoid
+	# having our glob match the uncompressed file here.
+	suffix=$(echo compressme.*)
+	[[ -z $suffix || "$suffix" == "compressme.*" ]] && \
+		suffix=$(echo compressme*)
+	suffix=${suffix#compressme}
+	cd /
+	rm -rf "${tmpdir}"
+	echo "${suffix}" > "${T}/.ecompress.suffix"
 }
 
 # figure out the new suffix
-suffix=$(guess_suffix)
-
-compress_file() {
-	mask_ext_re=""
-	set -f
-	for x in $PORTAGE_COMPRESS_EXCLUDE_SUFFIXES ; do
-		mask_ext_re+="|$x"
-	done
-	set +f
-	mask_ext_re="^(${mask_ext_re:1})\$"
-	declare -a filtered_args=()
-	i=0
-	for x in "$@" ; do
-		[[ ${x##*.} =~ $mask_ext_re ]] && continue
-		[[ -s ${x} ]] || continue
-		filtered_args[$i]=$x
-		((i++))
-	done
-	[ $i -eq 0 ] && return 0
-	set -- "${filtered_args[@]}"
-
-	# If a compressed version of the file already exists, simply
-	# delete it so that the compressor doesn't whine (bzip2 will
-	# complain and skip, gzip will prompt for input)
-	[[ -n ${suffix} ]] && echo -n "${@/%/${suffix}$'\001'}" | \
-		tr '\001' '\000' | ${XARGS} -0 rm -f
-
-	# forcibly break all hard links as some compressors whine about it
-	while IFS= read -d '' -r x ; do
-		cp -p "${x}" "${x}.ecompress.break" || die
-		mv -f "${x}.ecompress.break" "${x}" || die
-	done < <(find "${@}" -type f -links +1 -print0)
-
-	# Finally, let's actually do some real work
-	"${PORTAGE_COMPRESS}" ${PORTAGE_COMPRESS_FLAGS} "$@"
-	ret=$?
-	[[ $ret -ne 0 ]] && __helpers_die "${0##*/} failed"
-	return ${ret}
-}
+export PORTAGE_COMPRESS_SUFFIX=$(guess_suffix) || die
 
 fix_symlinks() {
 	# Repeat until nothing changes, in order to handle multiple
@@ -151,7 +110,7 @@ fix_symlinks() {
 	while read -r -d $'\0' brokenlink ; do
 		[[ -e ${brokenlink} ]] && continue
 		olddest=$(readlink "${brokenlink}")
-		newdest=${olddest}${suffix}
+		newdest=${olddest}${PORTAGE_COMPRESS_SUFFIX}
 		if [[ "${newdest}" == /* ]] ; then
 			[[ -f "${D%/}${newdest}" ]] || continue
 		else
@@ -159,7 +118,7 @@ fix_symlinks() {
 		fi
 		something_changed=${brokenlink}
 		rm -f "${brokenlink}" &&
-		ln -snf "${newdest}" "${brokenlink}${suffix}"
+		ln -snf "${newdest}" "${brokenlink}${PORTAGE_COMPRESS_SUFFIX}"
 		((ret|=$?))
 	done < <(find "${ED}" -type l -print0 || die)
 
@@ -176,13 +135,10 @@ fix_symlinks() {
 	return ${ret}
 }
 
-ret=0
-while IFS= read -d '' -r path; do
-	file_path=${path%.ecompress}
-
-	compress_file "${file_path}"
-	: $(( ret |= ${?} ))
-done < <(find "${ED}" -name '*.ecompress' -delete -print0 || die)
+export PORTAGE_COMPRESS PORTAGE_COMPRESS_FLAGS
+find "${ED}" -name '*.ecompress' -delete \
+	-exec "${PORTAGE_BIN_PATH}"/ecompress-file {} +
+ret=${?}
 
 fix_symlinks
 : $(( ret |= ${?} ))
