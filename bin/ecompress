@@ -95,7 +95,7 @@ guess_suffix() {
 	suffix=${suffix#compressme}
 	cd /
 	rm -rf "${tmpdir}"
-	echo "${suffix}" > "${T}/.ecompress.suffix"
+	echo "${suffix}"
 }
 
 # figure out the new suffix
