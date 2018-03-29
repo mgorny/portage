@@ -3421,7 +3421,7 @@ class dblink(object):
 		self.vartree.dbapi._plib_registry.pruneNonExisting()
 
 	def _collision_protect(self, srcroot, destroot, mypkglist,
-		file_list, symlink_list, install_mask):
+		file_list, symlink_list):
 
 			os = _os_merge
 
@@ -4059,7 +4059,7 @@ class dblink(object):
 
 		collisions, dirs_ro, symlink_collisions, plib_collisions = \
 			self._collision_protect(srcroot, destroot,
-			others_in_slot + blockers, filelist, linklist, install_mask)
+			others_in_slot + blockers, filelist, linklist)
 
 		# Check for read-only filesystems.
 		ro_checker = get_ro_checker()
