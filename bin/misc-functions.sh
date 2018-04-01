@@ -222,24 +222,13 @@ postinst_qa_check() {
 }
 
 preinst_mask() {
-	if [ -z "${D}" ]; then
-		 eerror "${FUNCNAME}: D is unset"
-		 return 1
-	fi
-
-	if ! ___eapi_has_prefix_variables; then
-		local ED=${D}
-	fi
-
-	# Make sure $PWD is not ${D} so that we don't leave gmon.out files
-	# in there in case any tools were built with -pg in CFLAGS.
-	cd "${T}"
-
-	# remove man pages, info pages, docs if requested
-	local f
+	# Remove man pages, info pages, docs if requested. This is
+	# implemented in bash in order to respect INSTALL_MASK settings
+	# from bashrc.
+	local f x
 	for f in man info doc; do
-		if has no${f} $FEATURES; then
-			INSTALL_MASK="${INSTALL_MASK} /usr/share/${f}"
+		if has no${f} ${FEATURES}; then
+			INSTALL_MASK+=" /usr/share/${f}"
 		fi
 	done
 
