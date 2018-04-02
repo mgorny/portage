@@ -6,8 +6,6 @@ import json
 import os
 import stat
 
-import yaml
-
 try:
 	FileNotFoundError
 except NameError:
@@ -68,17 +66,6 @@ def merge_config(base, head):
 
 	return result
 
-def _yaml_load(filename):
-	"""
-	Load filename as YAML and return a dict. Raise ConfigError if
-	it fails to load.
-	"""
-	with open(filename, 'rt') as f:
-		try:
-			return yaml.safe_load(f)
-		except yaml.parser.ParserError as e:
-			raise ConfigError("{}: {}".format(filename, e))
-
 def _json_load(filename):
 	"""
 	Load filename as JSON and return a dict. Raise ConfigError if
@@ -129,8 +116,6 @@ def load_config(conf_dirs, file_extensions=None, valid_versions=None):
 		extension = filename.rsplit('.', 1)[1]
 		if extension in ['json']:
 			loaders.append(_json_load)
-		elif extension in ['yml', 'yaml']:
-			loaders.append(_yaml_load)
 
 		config = None
 		exception = None

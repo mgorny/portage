@@ -530,12 +530,12 @@ setup(
 		['$portage_setsdir', ['cnf/sets/portage.conf']],
 		['$portage_base/bin', ['bin/deprecated-path']],
 		['$sysconfdir/portage/repo.postsync.d', ['cnf/repo.postsync.d/example']],
-		['share/repoman/qa_data', ['cnf/qa_data/qa_data.yaml']],
-		['share/repoman/linechecks', ['cnf/linechecks/linechecks.yaml']],
+		['share/repoman/qa_data', ['cnf/qa_data/qa_data.json']],
+		['share/repoman/linechecks', ['cnf/linechecks/linechecks.json']],
 		['share/repoman/repository', [
-			'cnf/repository/linechecks.yaml',
-			'cnf/repository/qa_data.yaml',
-			'cnf/repository/repository.yaml']],
+			'cnf/repository/linechecks.json',
+			'cnf/repository/qa_data.json',
+			'cnf/repository/repository.json']],
 	],
 
 	ext_modules = [Extension(name=n, sources=m,

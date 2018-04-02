@@ -4,9 +4,9 @@ moudules/scan/module.py
 Module loading and run list generator
 '''
 
+import json
 import logging
 import os
-import yaml
 
 import portage
 from portage.module import InvalidModuleName, Modules
@@ -29,14 +29,14 @@ class ModuleConfig(object):
 		@param configpaths: ordered list of filepaths to load
 		'''
 		if repository_modules:
-			self.configpaths = [os.path.join(path, 'repository.yaml') for path in configpaths]
+			self.configpaths = [os.path.join(path, 'repository.json') for path in configpaths]
 		elif _not_installed:
 			self.configpaths = [os.path.realpath(os.path.join(os.path.dirname(
 				os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(
-				os.path.dirname(__file__)))))), 'repoman/cnf/repository/repository.yaml'))]
+				os.path.dirname(__file__)))))), 'repoman/cnf/repository/repository.json'))]
 		else:
 			self.configpaths = [os.path.join(portage.const.EPREFIX or '/',
-				'usr/share/repoman/repository/repository.yaml')]
+				'usr/share/repoman/repository/repository.json')]
 		logging.debug("ModuleConfig; configpaths: %s", self.configpaths)
 
 		self.controller = Modules(path=MODULES_PATH, namepath="repoman.modules.scan")
@@ -62,14 +62,14 @@ class ModuleConfig(object):
 		if configpaths:
 			self.configpaths = configpaths
 		elif not self.configpaths:
-			logging.error("ModuleConfig; Error: No repository.yaml files defined")
+			logging.error("ModuleConfig; Error: No repository.json files defined")
 		configs = []
 		for path in self.configpaths:
 			logging.debug("ModuleConfig; Processing: %s", path)
 			if os.path.exists(path):
 				try:
 					with open(path, 'r') as inputfile:
-						configs.append(yaml.safe_load(inputfile.read()))
+						configs.append(json.load(inputfile.read()))
 				except IOError as error:
 					logging,error("Failed to load file: %s", inputfile)
 					logging.exception(error)

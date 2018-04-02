@@ -1,0 +1,6 @@
+{
+	"version": 1,
+	"repoman_version": "2.3.3",
+	"scan_modules": "description eapi ebuild_metadata fetches files keywords live manifests multicheck pkgmetadata profile restrict ruby",
+	"linechecks_modules": "assignment eapi3assignment implicitdepend hasq useq preservelib bindnow inherit dosym definition srcprepare eapi3deprecated pkgpretend eapi4incompatible eapi4gonevars paralleldisabled autodefault gentooheader nooffset nesteddie patches emakeparallel srccompileeconf srcunpackpatches portageinternal portageinternalvariableassignment quote quoteda httpsuri builtwith uselesscds uselessdodoc whitespace blankline addpredict noasneeded"
+}

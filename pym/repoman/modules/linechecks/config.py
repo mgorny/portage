@@ -70,7 +70,7 @@ class LineChecksConfig(object):
 			cnfdir = os.path.join(portage.const.EPREFIX or '/', 'usr/share/repoman/linechecks')
 		repomanpaths = [os.path.join(cnfdir, _file_) for _file_ in os.listdir(cnfdir)]
 		logging.debug("LineChecksConfig; repomanpaths: %s", repomanpaths)
-		repopaths = [os.path.join(path, 'linechecks.yaml') for path in self.repo_settings.masters_list]
+		repopaths = [os.path.join(path, 'linechecks.json') for path in self.repo_settings.masters_list]
 		self.infopaths = repomanpaths + repopaths
 		logging.debug("LineChecksConfig; configpaths: %s", self.infopaths)
 
@@ -82,13 +82,13 @@ class LineChecksConfig(object):
 		if infopaths:
 			self.infopaths = infopaths
 		elif not self.infopaths:
-			logging.error("LineChecksConfig; Error: No linechecks.yaml files defined")
+			logging.error("LineChecksConfig; Error: No linechecks.json files defined")
 
-		configs = load_config(self.infopaths, 'yaml', self.repo_settings.repoman_settings.valid_versions)
+		configs = load_config(self.infopaths, 'json', self.repo_settings.repoman_settings.valid_versions)
 		if configs == {}:
-			logging.error("LineChecksConfig: Failed to load a valid 'linechecks.yaml' file at paths: %s", self.infopaths)
+			logging.error("LineChecksConfig: Failed to load a valid 'linechecks.json' file at paths: %s", self.infopaths)
 			return False
-		logging.debug("LineChecksConfig: linechecks.yaml configs: %s", configs)
+		logging.debug("LineChecksConfig: linechecks.json configs: %s", configs)
 		self.info_config = configs
 
 		self.errors = self.info_config['errors']
