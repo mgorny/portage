@@ -102,16 +102,8 @@
 #     the application being installed.
 #PORTAGE_TMPDIR=/var/tmp
 #
-# PORTDIR is the location of the portage tree. This is the repository
-#     for all profile information as well as all ebuilds. If you change
-#     this, you must update your /etc/portage/make.profile symlink accordingly.
-#     ***Warning***
-#     Data stored inside PORTDIR is in peril of being overwritten or deleted by
-#     the emerge --sync command. The default value of PORTAGE_RSYNC_OPTS
-#     will protect the default locations of DISTDIR and PKGDIR, but users are
-#     warned that any other locations inside PORTDIR are not necessarily safe
-#     for data storage.
-#PORTDIR=/usr/portage
+# PORTDIR & PORTDIR_OVERLAY variables are obsolete. If you need
+# to override the repository paths, please use repos.conf instead.
 #
 # DISTDIR is where all of the source code tarballs will be placed for
 #     emerges. After packages are built, it is safe to remove any and
@@ -133,11 +125,6 @@
 #     group permissions will be applied to it.  If the directory already
 #     exists, portage will not modify its permissions.
 #PORT_LOGDIR=""
-#
-# PORTDIR_OVERLAY is a directory where local ebuilds may be stored without
-#     concern that they will be deleted by rsync updates. Default is not
-#     defined.
-#PORTDIR_OVERLAY=/usr/local/portage
 
 # Fetching files
 # ==============
@@ -193,27 +180,8 @@
 # Synchronization is handled by rsync and these settings allow some control
 # over how it is done.
 #
-# SYNC is the server used by rsync to retrieve a localized rsync mirror
-#     rotation. This allows you to select servers that are geographically
-#     close to you, yet still distribute the load over a number of servers.
-#     Please do not single out specific rsync mirrors. Doing so places undue
-#     stress on particular mirrors.  Instead you may use one of the following
-#     continent specific rotations:
-#
-#   Default:       "rsync://rsync.gentoo.org/gentoo-portage"
-#   North America: "rsync://rsync.namerica.gentoo.org/gentoo-portage"
-#   South America: "rsync://rsync.samerica.gentoo.org/gentoo-portage"
-#   Europe:        "rsync://rsync.europe.gentoo.org/gentoo-portage"
-#   Asia:          "rsync://rsync.asia.gentoo.org/gentoo-portage"
-#   Australia:     "rsync://rsync.au.gentoo.org/gentoo-portage"
-#
-#     If you have multiple Gentoo boxes, it is probably a good idea to have only
-#     one of them sync from the rotations above. The other boxes can then rsync
-#     from the local rsync server, reducing the load on the mirrors.
-#     Instructions for setting up a local rsync server are available here:
-#     https://wiki.gentoo.org/wiki/Local_Mirror
-#
-#SYNC="rsync://rsync.gentoo.org/gentoo-portage"
+# SYNC variable is obsolete. If you need to override the rsync URL,
+# please set sync-uri in repos.conf instead.
 #
 # PORTAGE_RSYNC_RETRIES sets the number of times portage will attempt to retrieve
 #     a current portage tree before it exits with an error. This allows
