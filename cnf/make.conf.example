@@ -118,17 +118,13 @@
 #     all files from this directory since they will be automatically
 #     fetched on demand for a given build. If you would like to
 #     selectively prune obsolete files from this directory, see
-#     eclean from the gentoolkit package. Note that locations under
-#     /usr/portage are not necessarily safe for data storage. See the
-#     PORTDIR documentation for more information.
-#DISTDIR=/usr/portage/distfiles
+#     eclean from the gentoolkit package.
+#DISTDIR=/var/cache/portage/distfiles
 #
 # PKGDIR is the location of binary packages that you can have created
 #     with '--buildpkg' or '-b' while emerging a package. This can get
-#     up to several hundred megs, or even a few gigs. Note that
-#     locations under /usr/portage are not necessarily safe for data
-#     storage. See the PORTDIR documentation for more information.
-#PKGDIR=/usr/portage/packages
+#     up to several hundred megs, or even a few gigs.
+#PKGDIR=/var/cache/portage/packages
 #
 # PORT_LOGDIR is the location where portage will store all the logs it
 #     creates from each individual merge. They are stored as
