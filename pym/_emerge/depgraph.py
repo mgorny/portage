@@ -3310,7 +3310,7 @@ class depgraph(object):
 			depend_root = myroot
 		else:
 			if eapi_attrs.bdepend:
-				depend_root = myroot
+				depend_root = pkg.root_config.settings["ESYSROOT"]
 			else:
 				depend_root = self._frozen_config._running_root.root
 				root_deps = self._frozen_config.myopts.get("--root-deps")

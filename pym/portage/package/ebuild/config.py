@@ -156,7 +156,7 @@ class config(object):
 
 	def __init__(self, clone=None, mycpv=None, config_profile_path=None,
 		config_incrementals=None, config_root=None, target_root=None,
-		eprefix=None, local_config=True, env=None,
+		sysroot=None, eprefix=None, local_config=True, env=None,
 		_unmatched_removal=False, repositories=None):
 		"""
 		@param clone: If provided, init will use deepcopy to copy by value the instance.
@@ -174,6 +174,9 @@ class config(object):
 		@param target_root: the target root, which typically corresponds to the
 			value of the $ROOT env variable (default is /)
 		@type target_root: String
+		@param sysroot: the sysroot to build against, which typically corresponds
+			 to the value of the $SYSROOT env variable (default is /)
+		@type sysroot: String
 		@param eprefix: set the EPREFIX variable (default is portage.const.EPREFIX)
 		@type eprefix: String
 		@param local_config: Enables loading of local config (/etc/portage); used most by repoman to
@@ -316,11 +319,14 @@ class config(object):
 
 			locations_manager = LocationsManager(config_root=config_root,
 				config_profile_path=config_profile_path, eprefix=eprefix,
-				local_config=local_config, target_root=target_root)
+				local_config=local_config, target_root=target_root,
+				sysroot=sysroot)
 			self._locations_manager = locations_manager
 
 			eprefix = locations_manager.eprefix
 			config_root = locations_manager.config_root
+			sysroot = locations_manager.sysroot
+			esysroot = locations_manager.esysroot
 			abs_user_config = locations_manager.abs_user_config
 
 			make_conf = getconfig(
@@ -464,8 +470,10 @@ class config(object):
 			#Loading Repositories
 			self["PORTAGE_CONFIGROOT"] = config_root
 			self["ROOT"] = target_root
+			self["SYSROOT"] = sysroot
 			self["EPREFIX"] = eprefix
 			self["EROOT"] = eroot
+			self["ESYSROOT"] = esysroot
 			known_repos = []
 			portdir = ""
 			portdir_overlay = ""
@@ -626,10 +634,14 @@ class config(object):
 			self.backup_changes("PORTAGE_CONFIGROOT")
 			self["ROOT"] = target_root
 			self.backup_changes("ROOT")
+			self["SYSROOT"] = sysroot
+			self.backup_changes("SYSROOT")
 			self["EPREFIX"] = eprefix
 			self.backup_changes("EPREFIX")
 			self["EROOT"] = eroot
 			self.backup_changes("EROOT")
+			self["ESYSROOT"] = esysroot
+			self.backup_changes("ESYSROOT")
 
 			# The prefix of the running portage instance is used in the
 			# ebuild environment to implement the --host-root option for
@@ -2694,6 +2706,11 @@ class config(object):
 		if not eapi_exports_merge_type(eapi):
 			mydict.pop("MERGE_TYPE", None)
 
+		src_phase = _phase_func_map.get(phase, '').startswith('src_')
+
+		if not (src_phase and eapi_attrs.sysroot):
+			mydict.pop("ESYSROOT", None)
+
 		# Prefix variables are supported beginning with EAPI 3, or when
 		# force-prefix is in FEATURES, since older EAPIs would otherwise be
 		# useless with prefix configurations. This brings compatibility with
@@ -2705,6 +2722,7 @@ class config(object):
 			mydict.pop("ED", None)
 			mydict.pop("EPREFIX", None)
 			mydict.pop("EROOT", None)
+			mydict.pop("ESYSROOT", None)
 
 		if phase not in ("pretend", "setup", "preinst", "postinst") or \
 			not eapi_exports_replace_vars(eapi):
@@ -2741,7 +2759,7 @@ class config(object):
 			mydict.pop("ECLASSDIR", None)
 
 		if not eapi_attrs.path_variables_end_with_trailing_slash:
-			for v in ("D", "ED", "ROOT", "EROOT"):
+			for v in ("D", "ED", "ROOT", "EROOT", "SYSROOT", "ESYSROOT"):
 				if v in mydict:
 					mydict[v] = mydict[v].rstrip(os.path.sep)
 
