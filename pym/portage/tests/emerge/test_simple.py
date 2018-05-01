@@ -116,12 +116,12 @@ pkg_preinst() {
 				"MISC_CONTENT": install_something,
 			},
 			"dev-libs/C-1": {
-				"EAPI" : "7_pre1",
+				"EAPI" : "7",
 				"KEYWORDS": "~x86",
 				"RDEPEND": "dev-libs/D[flag]",
 			},
 			"dev-libs/D-1": {
-				"EAPI" : "7_pre1",
+				"EAPI" : "7",
 				"KEYWORDS": "~x86",
 				"IUSE" : "flag",
 			},
