@@ -352,7 +352,7 @@ for arg in pargs:
 	except KeyboardInterrupt:
 		print("Interrupted.")
 		a = 1
-	except KeyError:
+	except PortageKeyError:
 		# aux_get error
 		a = 1
 	except UnsupportedAPIException as e:
