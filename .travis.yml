@@ -14,7 +14,6 @@ install:
 
 script:
     - printf "[build_ext]\nportage-ext-modules=true" >> setup.cfg
-    - ./setup.py test
     - ./setup.py install --root=/tmp/install-root
     - if [[ ${TRAVIS_PYTHON_VERSION} == ?.? ]]; then
         tox -e py${TRAVIS_PYTHON_VERSION/./};
