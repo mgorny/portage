@@ -84,7 +84,8 @@
 			"invalid": "This ebuild contains KEYWORDS that are not listed in profiles/arch.list or for which no valid profile was found",
 			"missing": "Ebuilds that have a missing or empty KEYWORDS variable",
 			"stable": "Ebuilds that have been added directly with stable KEYWORDS",
-			"stupid": "Ebuilds that use KEYWORDS=-* instead of package.mask"
+			"stupid": "Ebuilds that use KEYWORDS=-* instead of package.mask",
+			"unsorted": "Ebuilds that contain KEYWORDS which are not sorted alphabetically"
 		},
 		"LICENSE": {
 			"deprecated": "This ebuild is listing a deprecated license.",
