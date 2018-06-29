@@ -8392,7 +8392,7 @@ class depgraph(object):
 					else:
 						# Display the specific atom from SetArg or
 						# Package types.
-						if atom != atom.unevaluated_atom:
+						if atom.package and atom != atom.unevaluated_atom:
 							# Show the unevaluated atom, since it can reveal
 							# issues with conditional use-flags missing
 							# from IUSE.
