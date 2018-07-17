@@ -28,7 +28,7 @@ except KeyboardInterrupt:
 from os import path as osp
 here = osp.realpath(__file__)
 if osp.isfile(osp.join(osp.dirname(osp.dirname(here)), ".portage_not_installed")):
-	sys.path.insert(0, osp.join(osp.dirname(osp.dirname(osp.realpath(__file__))), "pym"))
+	sys.path.insert(0, osp.join(osp.dirname(osp.dirname(osp.realpath(__file__))), "lib"))
 
 import portage
 portage._internal_caller = True
