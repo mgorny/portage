@@ -93,7 +93,7 @@ class RsyncSync(NewBase):
 			rsynccommand.append('--exclude=/%s' % os.path.basename(download_dir))
 			rsynccommand.append('%s/' % download_dir.rstrip('/'))
 			rsynccommand.append('%s/' % self.repo.location)
-			exitcode = subprocess.call(rsynccommand)
+			exitcode = portage.process.spawn(rsynccommand, **self.spawn_kwargs)
 
 		return exitcode
 
