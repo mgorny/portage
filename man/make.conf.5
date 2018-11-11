@@ -562,9 +562,9 @@ parallelization. For additional parallelization, disable
 .B pid\-sandbox
 Isolate the process space for the ebuild processes. This makes it
 possible to cleanly kill all processes spawned by the ebuild.
-Supported only on Linux. Requires PID namespace support in kernel.
-
-Implies \fBmount\-sandbox\fR as it requires mounting new /proc.
+Supported only on Linux. Requires PID and mount namespace support
+in kernel. /proc is remounted inside the mount namespace to account
+for new PID namespace.
 .TP
 .B prelink\-checksums
 If \fBprelink\fR(8) is installed then use it to undo any prelinks on files

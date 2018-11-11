@@ -519,13 +519,12 @@ def _exec(binary, mycommand, opt_name, fd_pipes, env, gid, groups, uid, umask,
 					flags |= CLONE_NEWNET
 				if unshare_ipc:
 					flags |= CLONE_NEWIPC
-				if unshare_pid:
-					flags |= CLONE_NEWPID
-					# we need to remount /proc, so need mount ns
-					unshare_mount = True
 				if unshare_mount:
 					# NEWNS = mount namespace
 					flags |= CLONE_NEWNS
+				if unshare_pid:
+					# we also need mount namespace for slave /proc
+					flags |= CLONE_NEWPID | CLONE_NEWNS
 
 				try:
 					if libc.unshare(flags) != 0:
@@ -554,17 +553,23 @@ def _exec(binary, mycommand, opt_name, fd_pipes, env, gid, groups, uid, umask,
 								writemsg("Unable to mark mounts private: %d\n" % (mount_ret,),
 									noiselevel=-1)
 						if unshare_pid:
+							# we need at least /proc being slave
+							s = subprocess.Popen(['mount',
+								'--make-slave', '/proc'])
+							mount_ret = s.wait()
 							if mount_ret != 0:
-								# can't proceed without private mounts
+								# can't proceed with shared /proc
+								writemsg("Unable to mark /proc slave: %d\n" % (mount_ret,),
+									noiselevel=-1)
 								os._exit(1)
 							# mount new /proc for our namespace
 							s = subprocess.Popen(['mount',
 								'-t', 'proc', 'proc', '/proc'])
 							mount_ret = s.wait()
 							if mount_ret != 0:
-								# TODO: fatal?
 								writemsg("Unable to mount new /proc: %d\n" % (mount_ret,),
 									noiselevel=-1)
+								os._exit(1)
 						if unshare_net:
 							# 'up' the loopback
 							IFF_UP = 0x1
