@@ -15,7 +15,12 @@ def main(argv):
 	while True:
 		pid, status = os.wait()
 		if pid == main_child_pid:
-			return os.WEXITSTATUS(status)
+			if os.WIFEXITED(status):
+				return os.WEXITSTATUS(status)
+			elif os.WIFSIGNALED(status):
+				os.kill(os.getpid(), os.WTERMSIG(status))
+			# go to the unreachable place
+			break
 
 	# this should never be reached
 	return 127
