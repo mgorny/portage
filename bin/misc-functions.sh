@@ -191,13 +191,9 @@ __dyn_instprep() {
 	# the binary package.
 	if ! has binpkg-dostrip ${FEATURES}; then
 		export STRIP_MASK
-		if ___eapi_has_dostrip; then
-			"${PORTAGE_BIN_PATH}"/estrip --queue "${PORTAGE_DOSTRIP[@]}"
-			"${PORTAGE_BIN_PATH}"/estrip --ignore "${PORTAGE_DOSTRIP_SKIP[@]}"
-			"${PORTAGE_BIN_PATH}"/estrip --dequeue
-		else
-			prepallstrip
-		fi
+		"${PORTAGE_BIN_PATH}"/estrip --queue "${PORTAGE_DOSTRIP[@]}"
+		"${PORTAGE_BIN_PATH}"/estrip --ignore "${PORTAGE_DOSTRIP_SKIP[@]}"
+		"${PORTAGE_BIN_PATH}"/estrip --dequeue
 	fi
 
 	if has chflags ${FEATURES}; then
