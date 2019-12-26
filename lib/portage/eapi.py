@@ -109,6 +109,10 @@ def eapi_has_bdepend(eapi):
 	return eapi not in ("0", "1", "2", "3", "4", "4-python", "4-slot-abi",
 			"5", "5-progress", "6")
 
+def eapi_has_idepend(eapi):
+	return eapi not in ("0", "1", "2", "3", "4", "4-python", "4-slot-abi",
+			"5", "5-progress", "6", "7")
+
 def eapi_empty_groups_always_true(eapi):
 	return eapi in ("0", "1", "2", "3", "4", "4-python", "4-slot-abi",
 			"5", "5-progress", "6")
@@ -130,7 +134,7 @@ _eapi_attrs = collections.namedtuple('_eapi_attrs',
 	'bdepend broot dots_in_PN dots_in_use_flags exports_EBUILD_PHASE_FUNC '
 	'exports_PORTDIR exports_ECLASSDIR '
 	'feature_flag_test '
-	'iuse_defaults iuse_effective posixish_locale '
+	'idepend iuse_defaults iuse_effective posixish_locale '
 	'path_variables_end_with_trailing_slash '
 	'repo_deps required_use required_use_at_most_one_of slot_operator slot_deps '
 	'src_uri_arrows strong_blocks use_deps use_dep_defaults '
@@ -165,6 +169,7 @@ def _get_eapi_attrs(eapi):
 		exports_PORTDIR = (eapi is None or eapi_exports_PORTDIR(eapi)),
 		exports_ECLASSDIR = (eapi is not None and eapi_exports_ECLASSDIR(eapi)),
 		feature_flag_test = False,
+		idepend = (eapi is not None and eapi_has_idepend(eapi)),
 		iuse_defaults = (eapi is None or eapi_has_iuse_defaults(eapi)),
 		iuse_effective = (eapi is not None and eapi_has_iuse_effective(eapi)),
 		path_variables_end_with_trailing_slash = (eapi is not None and

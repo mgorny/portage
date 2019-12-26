@@ -697,6 +697,17 @@ previously known as \fBHDEPEND\fR in the experimental
 
 You may use the syntax described above in the \fBDependencies\fR section.
 .TP
+.B IDEPEND
+This should contain a list of all packages that are required to be
+executable during merging of this package (aka \fInative install-time\fR
+dependencies).  These are usually post-install tooling, like cache
+generators.  They will be installed into the system performing
+the merge.
+
+This variable was introduced in \fBEAPI 8\fR.
+
+You may use the syntax described above in the \fBDependencies\fR section.
+.TP
 .B PDEPEND
 This should contain a list of all packages that should be merged after this
 one (aka \fIpost\fR merge dependencies), but which may be installed by the

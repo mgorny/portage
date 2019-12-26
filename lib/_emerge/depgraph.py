@@ -3351,11 +3351,13 @@ class depgraph:
 			"deep" not in self._dynamic_config.myparams:
 			edepend["RDEPEND"] = ""
 			edepend["PDEPEND"] = ""
+			edepend["IDEPEND"] = ""
 
 		if pkg.onlydeps and \
 			self._frozen_config.myopts.get("--onlydeps-with-rdeps") == 'n':
 			edepend["RDEPEND"] = ""
 			edepend["PDEPEND"] = ""
+			edepend["IDEPEND"] = ""
 
 		ignore_build_time_deps = False
 		if pkg.built and not removal_action:
@@ -3421,6 +3423,8 @@ class depgraph:
 				self._priority(buildtime=True,
 				optional=(pkg.built or ignore_bdepend_deps),
 				ignored=ignore_bdepend_deps)),
+			(self._frozen_config._running_root.root, edepend["IDEPEND"],
+				self._priority(runtime=True)),
 		)
 
 		debug = "--debug" in self._frozen_config.myopts
@@ -5115,6 +5119,7 @@ class depgraph:
 								dep_strings.add(node._metadata[k])
 						if priority.runtime:
 							dep_strings.add(node._metadata["RDEPEND"])
+							dep_strings.add(node._metadata["IDEPEND"])
 						if priority.runtime_post:
 							dep_strings.add(node._metadata["PDEPEND"])
 

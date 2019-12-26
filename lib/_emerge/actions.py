@@ -1367,6 +1367,7 @@ def _calc_depclean(settings, trees, ldpath_mtimes,
 		runtime_post = UnmergeDepPriority(runtime_post=True)
 		buildtime = UnmergeDepPriority(buildtime=True)
 		priority_map = {
+			"IDEPEND": runtime,
 			"RDEPEND": runtime,
 			"PDEPEND": runtime_post,
 			"BDEPEND": buildtime,

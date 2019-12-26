@@ -25,7 +25,7 @@ class database(flat_hash.database):
 	complete_eclass_entries = False
 	auxdbkey_order=('DEPEND', 'RDEPEND', 'SLOT', 'SRC_URI',
 		'RESTRICT',  'HOMEPAGE',  'LICENSE', 'DESCRIPTION',
-		'KEYWORDS',  'INHERITED', 'IUSE', 'REQUIRED_USE',
+		'KEYWORDS',  'IDEPEND',   'INHERITED', 'IUSE', 'REQUIRED_USE',
 		'PDEPEND',   'BDEPEND',   'EAPI', 'PROPERTIES',
 		'DEFINED_PHASES')
 
