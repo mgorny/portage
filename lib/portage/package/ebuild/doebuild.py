@@ -98,7 +98,7 @@ from portage.exception import (
     UnsupportedAPIException,
 )
 from portage.localization import _
-from portage.output import colormap
+from portage.output import colormap, output_prefixes
 from portage.package.ebuild.prepare_build_dirs import prepare_build_dirs
 from portage.process import find_binary
 from portage.util import (
@@ -508,6 +508,7 @@ def doebuild_environment(
 
     # Allow color.map to control colors associated with einfo, ewarn, etc...
     mysettings["PORTAGE_COLORMAP"] = colormap()
+    mysettings["PORTAGE_OUTPUT_PREFIXES"] = output_prefixes()
 
     if "COLUMNS" not in mysettings:
         # Set COLUMNS, in order to prevent unnecessary stty calls

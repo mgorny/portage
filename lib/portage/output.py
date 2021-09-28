@@ -171,6 +171,14 @@ _styles["PKG_NOMERGE_WORLD"] = ("blue",)
 _styles["PROMPT_CHOICE_DEFAULT"] = ("green",)
 _styles["PROMPT_CHOICE_OTHER"] = ("red",)
 
+OUTPUT_PREFIXES = {
+    "ERR": "[EE]",
+    "INFO": "[..]",
+    "LOG": "[II]",
+    "QAWARN": "[QA]",
+    "WARN": "[WW]",
+}
+
 
 def _parse_color_map(config_root="/", onerror=None):
     """
@@ -397,6 +405,12 @@ def colormap():
     return "\n".join(mycolors)
 
 
+def output_prefixes():
+    return "\n".join(
+        "PORTAGE_PREFIX_{}={}".format(k, repr(v)) for k, v in OUTPUT_PREFIXES.items()
+    )
+
+
 def colorize(color_key, text):
     global havecolor
     if havecolor:
@@ -405,6 +419,10 @@ def colorize(color_key, text):
         if color_key in _styles:
             return style_to_ansi_code(color_key) + text + codes["reset"]
     return text
+
+
+def colorize_prefix(key):
+    return colorize(key, OUTPUT_PREFIXES[key]) + " "
 
 
 compat_functions_colors = [
@@ -636,7 +654,7 @@ class EOutput:
             self._write(
                 out,
                 "%*s%s\n"
-                % ((self.term_columns - self.__last_e_len - 7), "", status_brackets),
+                % ((self.term_columns - self.__last_e_len - 8), "", status_brackets),
             )
 
     def ebegin(self, msg):
@@ -650,7 +668,7 @@ class EOutput:
         msg += " ..."
         if not self.quiet:
             self.einfon(msg)
-        self.__last_e_len = len(msg) + 3
+        self.__last_e_len = len(msg) + 4
         self.__last_e_cmd = "ebegin"
 
     def eend(self, errno, *msg):
@@ -680,7 +698,7 @@ class EOutput:
         if not self.quiet:
             if self.__last_e_cmd == "ebegin":
                 self._write(out, "\n")
-            self._write(out, colorize("ERR", " * ") + msg + "\n")
+            self._write(out, colorize_prefix("ERR") + msg + "\n")
         self.__last_e_cmd = "eerror"
 
     def einfo(self, msg):
@@ -694,7 +712,7 @@ class EOutput:
         if not self.quiet:
             if self.__last_e_cmd == "ebegin":
                 self._write(out, "\n")
-            self._write(out, colorize("INFO", " * ") + msg + "\n")
+            self._write(out, colorize_prefix("INFO") + msg + "\n")
         self.__last_e_cmd = "einfo"
 
     def einfon(self, msg):
@@ -708,7 +726,7 @@ class EOutput:
         if not self.quiet:
             if self.__last_e_cmd == "ebegin":
                 self._write(out, "\n")
-            self._write(out, colorize("INFO", " * ") + msg)
+            self._write(out, colorize_prefix("INFO") + msg)
         self.__last_e_cmd = "einfon"
 
     def eqawarn(self, msg):
@@ -722,7 +740,7 @@ class EOutput:
         if not self.quiet:
             if self.__last_e_cmd == "ebegin":
                 self._write(out, "\n")
-            self._write(out, colorize("QAWARN", " * ") + msg + "\n")
+            self._write(out, colorize_prefix("QAWARN") + msg + "\n")
         self.__last_e_cmd = "ewarn"
 
     def elog(self, msg):
@@ -736,7 +754,7 @@ class EOutput:
         if not self.quiet:
             if self.__last_e_cmd == "ebegin":
                 self._write(out, "\n")
-            self._write(out, colorize("LOG", " * ") + msg + "\n")
+            self._write(out, colorize_prefix("LOG") + msg + "\n")
         self.__last_e_cmd = "elog"
 
     def ewarn(self, msg):
@@ -750,7 +768,7 @@ class EOutput:
         if not self.quiet:
             if self.__last_e_cmd == "ebegin":
                 self._write(out, "\n")
-            self._write(out, colorize("WARN", " * ") + msg + "\n")
+            self._write(out, colorize_prefix("WARN") + msg + "\n")
         self.__last_e_cmd = "ewarn"
 
     def ewend(self, errno, *msg):
